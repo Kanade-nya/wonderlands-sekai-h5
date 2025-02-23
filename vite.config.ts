@@ -7,6 +7,7 @@ import IconsResolver from 'unplugin-icons/resolver'
 import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
 import {ElementPlusResolver} from "unplugin-vue-components/resolvers";
+import {UndrawUiResolver} from "undraw-ui/es/resolvers";
 // import {resolve} from "node:url";
 import {resolve} from 'path'
 // https://vite.dev/config/
@@ -36,6 +37,7 @@ export default defineConfig({
                 IconsResolver({
                     enabledCollections: ['ep'],
                 }),
+                UndrawUiResolver
             ],
         }),
 

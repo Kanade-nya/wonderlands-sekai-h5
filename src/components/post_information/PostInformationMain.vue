@@ -80,6 +80,7 @@ import COS from "cos-js-sdk-v5";
 import CryptoJS from 'crypto-js'
 import axios from "axios";
 import router from "@/router/router.js";
+import {apiConfig} from "@/config/Config.js";
 
 import {
 	S3Client,
@@ -95,16 +96,16 @@ let cos = ''
 let s3 = ''
 const getKeyAndId = async () => {
 	cos = new COS({
-		SecretId: 'AKIDWv76yfXTVi3jNvbDtSsDMH3pkjs9Sk7X',
-		SecretKey: 'a4sldccUTewtkws2QuQ2XxGWjzHpKmPC'
+		SecretId: apiConfig.getCosConfig().SecretId,
+		SecretKey: apiConfig.getCosConfig().SecretKey
 	})
 	s3 = new S3Client({
 		region: 'auto',
 		endpoint: `https://${ACCOUNT_ID}.r2.cloudflarestorage.com`,
 		// endpoint: `https://${ACCOUNT_ID}.cos.ap-chengdu.myqcloud.com`,
 		credentials: {
-			accessKeyId: '9efefcd5e0aa0d1ae32a08469bce5dd8',
-			secretAccessKey: 'f49d4005117f64ec1ea25ccc6eb85b503cbe72386ef63448891d8c6ccedee9eb',
+			accessKeyId: apiConfig.getS3Config().accessKeyId,
+			secretAccessKey: apiConfig.getS3Config().secretAccessKey,
 		},
 	})
 	///固定的桶

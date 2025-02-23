@@ -156,6 +156,11 @@ const routes = [
                 name: 'login',
                 component: () => import('@/pages/User/UserLogin.vue'),
             },
+            {
+                path: 'comments',
+                name: 'userComments',
+                component: () => import('@/pages/User/UserComments.vue')
+            }
         ]
 
 

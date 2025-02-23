@@ -51,6 +51,7 @@ declare module 'vue' {
     SearchComponent: typeof import('./src/components/search/SearchComponent.vue')['default']
     SearchInput: typeof import('./src/components/common/SearchInput.vue')['default']
     TypeSelector: typeof import('./src/components/uploader/TypeSelector.vue')['default']
+    UComment: typeof import('undraw-ui')['UComment']
     UploadImage: typeof import('./src/components/uploader/UploadImage.vue')['default']
     VerticalMenu: typeof import('./src/components/grid/VerticalMenu.vue')['default']
   }
