@@ -1,24 +1,24 @@
 <template>
 	<div class="page-container">
-		<details-title
-			:title="box.title"
-			:date="box.create_date"
-			:character="box.character"
-			:type="box.type"
-		></details-title>
+<!--		<details-title-->
+<!--			:title="props.details.title"-->
+<!--			:date="props.details.create_date"-->
+<!--			:character="props.details.character"-->
+<!--			:type="props.details.type"-->
+<!--		></details-title>-->
 		<!-- 头部宣传区域 -->
 
 		<!-- 画集介绍区域 -->
-		<div class="introduction">
-			<h3>Introduction</h3>
-			<!--			<p>日本画师椎名優(椎名优、しいな ゆう、Shiina Yuu)的小画集，跨页图有拼接痕迹。</p>-->
-			<p>画师： {{ box.illustrator }}</p>
-			<!--			<p>上传日期： {{box.create_date}}</p>-->
-			<p>类型： {{ box.type }}</p>
-			<div style="border-top: 1px solid #ccc;margin: 8px 0 "></div>
-			<div class="description" v-html="box.description">
-			</div>
-		</div>
+<!--		<div class="introduction">-->
+<!--			<h3>Introduction</h3>-->
+<!--			&lt;!&ndash;			<p>日本画师椎名優(椎名优、しいな ゆう、Shiina Yuu)的小画集，跨页图有拼接痕迹。</p>&ndash;&gt;-->
+<!--			<p>画师： {{ props.details.artiest }}</p>-->
+<!--			&lt;!&ndash;			<p>上传日期： {{box.create_date}}</p>&ndash;&gt;-->
+<!--			<p>类型： {{ props.details.type }}</p>-->
+<!--			<div style="border-top: 1px solid #ccc;margin: 8px 0 "></div>-->
+<!--			<div class="description" v-html="props.details.description">-->
+<!--			</div>-->
+<!--		</div>-->
 		<!--		&lt;!&ndash; 下载地址区域 &ndash;&gt;-->
 		<!--		<div class="download">-->
 		<!--			<h3>下载地址</h3>-->
@@ -32,104 +32,53 @@
 		<!--		</div>-->
 		<!-- 图片区域 -->
 		<div class="image-list">
-			<h3>Image</h3>
+			<h3 style="margin: 4px 0">Image</h3>
+			<p style="margin: 4px 0">画师： {{ props.details.artiest }}</p>
 			<div class="image-list-container">
 				<!--				<img src="@/assets/img_1.png" class="listed-image">-->
 				<!--				<img src="@/assets/e0a9ce33a7fef53e5557e9bc2b9dafbe3546749308242173.jpg" class="listed-image">-->
 				<!--				<img src="@/assets/img.png" class="listed-image">-->
-				<div v-for="(path,index) in box.image_url">
-					<el-image
-						class="listed-image"
-						alt=""
-						:src="path"
-						:preview-src-list="getPreviewImages(index)"
-						lazy
-					>
-					</el-image>
-				</div>
+<!--				轮播图-->
+				<el-carousel trigger="click"   class="cdc-carousel" @click="console.log(image_url)">
+					<el-carousel-item v-for="(path,index) in image_url" :key="index" >
+						<el-image
+							class="listed-image"
+							:src="path + '?imageMogr2/thumbnail/!50p'"
+						/>
+					</el-carousel-item>
+				</el-carousel>
 			</div>
 		</div>
-		<!--		评论区域-->
-		<Waline :serverURL="serverURL" :path="path" :reaction="[]"/>
+
 	</div>
 </template>
 
 <script setup>
-import {computed, onMounted, ref} from 'vue';
-import DetailsTitle from "@/components/details/DetailsTitle.vue";
-import {baseUrl, imageUrl} from "@/utils/methods.js";
+import {ref,onMounted,defineProps} from "vue";
+import {parseImageUrl} from "@/utils/methods.js";
 
+const props = defineProps({
+	details: {
+		type: Array,
+		required: true,
+	}
+})
+const image_url = ref([])
+onMounted(() => {
+	console.log(props.details)
+	image_url.value = parseImageUrl(props.details.image_url)
+	console.log(image_url)
+})
 
-// Waline评论面板
-import {Waline} from '@waline/client/component';
-import {useRoute} from 'vue-router';
-
-import '@waline/client/style';
-import requests from "@/utils/requests.js";
-
-import {useGetIpStore} from "@/stores/useGetIpStore.js";
-const {getIp} = useGetIpStore()
-
-
-const serverURL = 'https://comments.wonderlands-sekai.space';
-const path = computed(() => useRoute().path);
-
-
-// const imageUrl = ref('https://lingma-vl.oss-rg-china-mainland.aliyuncs.com/cloud/CPlxwF91fytKRrml8tR004190ZvojZlzmU6U0P3s2ZM/0e408adf-4593-4195-ae29-6b4b97d7d150_1736484421300.png'); // 替换为实际的宣传图地址
-const box = ref({})
-
+// 调整图片顺序
 const getPreviewImages = (index) => {
-	let tempImgList = [...box.value.image_url];//所有图片地址
+	let tempImgList = [...props.details.image_url];//所有图片地址
 	if (index === 0) return tempImgList;
 	// 调整图片顺序，把当前图片放在第一位
 	let start = tempImgList.splice(index);
 	let remain = tempImgList.splice(0, index);
 	return start.concat(remain);
 }
-
-const props = defineProps({
-	id: {
-		type: String,
-		required: true,
-		default: ''
-	}
-})
-
-
-onMounted(() => {
-	// console.log(props.id)
-	const firstLoading = ElLoading.service({
-		text: '少女祈祷中...'
-	})
-	requests.get(
-		`${baseUrl}/api2/website_image/${props.id}`,
-		{
-			params: {
-				// id: props.id
-			}
-		}
-	).then(response => {
-		// console.log(response.data)
-		if (response.status === 200) {
-			box.value = response.data.data
-			let origin_urls = JSON.parse(box.value.image_url.replace(/'/g, '"'))
-			let after_urls = origin_urls.map(item => {
-				return `${imageUrl}/${item.split('/')[item.split('/').length - 1]}`
-			})
-
-			if (getIp() !== 'CN' && getIp() !== '') {
-				box.value.image_url = after_urls
-			}else{
-				box.value.image_url = origin_urls
-			}
-			// console.log(origin_url)
-			// box.value.image_url =  after_urls;
-			box.value.description = box.value.description.replace(/\n/g, '<br>')
-		}
-		firstLoading.close()
-	})
-})
-
 </script>
 
 <style scoped lang="scss">
@@ -160,6 +109,9 @@ onMounted(() => {
 	}
 }
 
+:deep(.el-image__inner){
+	max-height: 400px;
+}
 .page-container {
 	width: 100%;
 	//padding: 20px;
@@ -219,22 +171,46 @@ onMounted(() => {
 	}
 
 	.image-list {
-		margin-top: 20px;
+		//margin-top: 20px;
 		background-color: #f0f8ff;
 		border-radius: 10px;
 		padding: 12px 20px;
-
 		box-sizing: border-box;
 
 		.image-list-container {
-			padding: 0 130px;
-
-			.listed-image {
-				width: 100%;
-				object-fit: cover;
-				height: auto;
+			//padding: 0 130px;
+			//margin: 0 auto;
+			width: 100%;
+			//margin: 0 auto;
+			//display: flex;
+			//justify-content: center;
+			:deep(.el-carousel__container){
+				height: 400px;
 			}
-
+			.cdc-carousel{
+				height: 400px;
+				:deep(.el-carousel__item){
+					display: flex;
+					justify-content: center;
+					align-items: center;
+				}
+			}
+			.listed-image {
+				max-height: 100%;
+				//width: 100%;
+				border-radius: 8px;
+				//height: 400px;
+				margin: 0 auto;
+				//display: flex;
+				//justify-content: center;
+				//align-items: center;
+				:deep(.el-image__inner){
+					object-fit: cover !important;
+				}
+				img {
+					object-fit: cover !important;
+				}
+			}
 		}
 
 		h3 {
@@ -287,6 +263,35 @@ onMounted(() => {
 				border-radius: 5px;
 				cursor: pointer;
 			}
+		}
+	}
+}
+
+@media screen and (max-width: 768px) {
+	:deep(.el-carousel__container){
+		height: 200px !important;
+	}
+	.cdc-carousel{
+		height: 200px !important;
+		:deep(.el-carousel__item){
+			display: flex;
+			justify-content: center;
+			align-items: center;
+		}
+	}
+	.listed-image {
+		//width: 100%;
+		border-radius: 8px;
+		height: 400px;
+		margin: 0 auto;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		:deep(.el-image__inner){
+			object-fit: cover !important;
+		}
+		img {
+			object-fit: cover !important;
 		}
 	}
 }

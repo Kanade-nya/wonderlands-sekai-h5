@@ -41,3 +41,6 @@ sudo lsof -i :5000
 
 
 [ 'https://pjsk-image-1304757492.cos.ap-chengdu.myqcloud.com/image_storage/30ccc3bdd8269f397ec53e54a8b5b2cc.jpg','https://pjsk-image-1304757492.cos.ap-chengdu.myqcloud.com/image_storage/2819c5259bea9796d38df8a2dd608018.jpg']
+
+
+nohup uvicorn main:app --reload  > service.log 2>&1 &

@@ -165,6 +165,28 @@ const routes = [
 
 
     },
+    {
+        path: '/c',
+        name: 'collection',
+        children: [
+            {
+                path: 'box',
+                name: 'collectionBox',
+                component: () => import('@/pages/Collection/Collection.vue')
+            },
+            {
+                path: 'detail/:id',
+                name: 'collectionDetail',
+                props: true,
+                component: () => import('@/pages/Collection/CollectionDetailPage.vue')
+            },
+            {
+                path: 'add',
+                name: 'collectionAdd',
+                component: () => import('@/pages/Collection/CollectionPost.vue')
+            }
+        ]
+    }
 ]
 
 const router = createRouter({

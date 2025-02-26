@@ -30,10 +30,6 @@ get
 }
 ```
 
-
-
-
-
 ## 登录模块
 
 ### api: register
@@ -68,3 +64,14 @@ response:
 post :
 | token | 用户token
 |time|时间戳
+
+## 合集功能
+
+### 数据库表结构
+
+| 名字   | 类型     | 备注   |   
+|------|--------|------|
+| id   | Number | 自增id |
+| Name | String | 合集名称 |  
+
+### api1: 新建合集

@@ -10,7 +10,7 @@
 <!--				lazy-->
 <!--				fit="cover"/>-->
 			<el-image
-				:src="imageSrc"
+				:src="props.src + '?imageMogr2/thumbnail/!30p'"
 				@contextmenu.prevent="openImageViewer"
 				alt=""
 				lazy

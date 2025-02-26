@@ -4,7 +4,7 @@
 		<div class="title-section">
 			<h1 class="title">{{ title }}    <span style='margin-right: 20px'></span> {{character}}</h1>
 			<div class="meta-info">
-				<span>{{ date }}</span>
+				<span>{{ formatDate(date) }}</span>
 <!--				<span>•</span>-->
 				<span>{{ type }}</span>
 <!--				<span>•</span>-->
@@ -16,7 +16,7 @@
 
 <script setup>
 import { ref } from 'vue';
-
+import {formatDate} from "@/utils/methods.js";
 // const title = ref('[会员][画集][天球堂 (椎名優)]Edel Farben[25P]');
 // const date = ref('2024年12月25日 21:39');
 // const category = ref('同人&小画集');
@@ -24,9 +24,15 @@ import { ref } from 'vue';
 
 const props = defineProps({
 	title: String,
-	character: String,
 	date: String,
-	type: String,
+	type: {
+		type: String,
+		default: ''
+	},
+	character: {
+		type: String,
+		default: ''
+	}
 });
 
 </script>

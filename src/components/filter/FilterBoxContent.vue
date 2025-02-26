@@ -5,7 +5,7 @@
 <!--			<el-image :src="props.src + '?imageMogr2/thumbnail/!30p'" alt="" lazy fit="cover"/>-->
 <!--			<el-image :src="props.src" alt="" lazy fit="cover"/>-->
 			<el-image
-				:src="imageSrc"
+				:src="props.src + '?imageMogr2/thumbnail/!30p'"
 				alt=""
 				lazy
 				fit="cover"/>

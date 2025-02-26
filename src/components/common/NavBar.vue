@@ -88,6 +88,10 @@ const jump2Comments = () => {
 	router.push('/comments')
 }
 
+const jump2Collection = () => {
+	router.push('/c/box')
+}
+
 const isPanelVisible = ref(false);
 
 const onMenuClick = () => {
@@ -169,6 +173,12 @@ const searchInfo = (search_query) =>{
 				</div>
 			</el-link>
 
+
+			<el-link :underline="false" @click="jump2Collection">
+				<div class="grid-item" :class="{is_selected: is_selected === 6}" @click="handleClick('合集',6)">
+					<span>合集</span>
+				</div>
+			</el-link>
 
 			<el-link :underline="false" @click="jump2Comments">
 				<div class="grid-item" :class="{is_selected: is_selected === 5}" @click="handleClick('展示4',5) ">

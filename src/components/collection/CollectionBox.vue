@@ -1,73 +1,105 @@
-<script setup lang="ts">
+<!--合集功能的BOX-->
 
+<script setup lang="ts">
+import {ref, defineProps} from 'vue'
+import {useRouter} from "vue-router";
+
+const router = useRouter();
+const props = defineProps({
+	id: {
+		type: Number,
+		required: true,
+		default: ''
+	},
+	cover: {
+		type: [String, null],
+		default: ''
+	},
+	description: {
+		type: String,
+		default: ''
+	},
+	date: {
+		type: String,
+		default: ''
+	},
+	name: {
+		type: String,
+		default: ''
+	}
+})
+
+console.log('props', props)
+
+const formatDate = (dateString: string): string => {
+	const date = new Date(dateString)
+	const year = date.getFullYear()
+	const month = date.getMonth() + 1 // 月份从0开始，需要加1
+	const day = date.getDate()
+	return `${year}-${month}-${day}`
+}
+
+const jumpToId = () => {
+	router.push({
+		path: `/c/detail/${props.id}`
+	})
+}
 </script>
 
 <template>
-	<div data-v-c80da821="" data-v-5224a3cb="" class="post-card-item default post-card-item card" show-author="true">
-		<a data-v-c80da821="" href="/p/98386.html" class="" target="_blank" rel="follow"
-		   id="F5D6CB23-440D-440E-BDF3-05936C420321">
-
-			<div data-v-c80da821="" class="arco-image arco-image-with-footer-inner post-card-image">
-				<img class="arco-image-img" src="https://p0.picjs.xyz/2021/09/1513172701603df1e22_1_post.jpg"
+	<div class="post-card-item default post-card-item card" show-author="true">
+		<div href="#" class="a-div" rel="follow" @click="jumpToId">
+			<div class="arco-image arco-image-with-footer-inner post-card-image">
+				<img class="arco-image-img" :src="props.cover"
 				     style="object-fit: cover;" alt="">
 				<!--v-if-->
-				<div class="arco-image-footer" prefix-cls="arco-image"><!--v-if-->
-					<div class="arco-image-footer-extra">
-					<span data-v-c80da821="" class="badge bg-gradient-light badge-sm false text-dark!">
-						<i data-v-de939e51="" data-v-c80da821="" class="vikacg-credit xs vikacg-icon"></i>
-						<span data-v-c80da821="" class="small">支付积分</span>
-					</span>
-					</div>
-				</div>
+<!--				<div class="arco-image-footer" prefix-cls="arco-image">&lt;!&ndash;v-if&ndash;&gt;-->
+<!--					<div class="arco-image-footer-extra">-->
+<!--                        <span class="badge bg-gradient-light badge-sm false text-dark!">-->
+<!--                            <i class="vikacg-credit xs vikacg-icon"></i>-->
+<!--                            <span class="small">支付积分</span>-->
+<!--                        </span>-->
+<!--					</div>-->
+<!--				</div>-->
 			</div>
-		</a>
-		<div data-v-c80da821="" class="post-card-info">
-			<h4 data-v-c80da821="" class="title">
-				<a data-v-c80da821="" href="/p/98386.html" class="text-dark!" target="_blank" rel="follow"
-				   id="A0FCBD8C-F200-402E-BC93-CE759C8F83B2">
-					Koikatu 手工分類角色卡9605張 個別獨立 壓縮包(停更)
+		</div>
+		<div class="post-card-info">
+			<h4 class="title">
+				<a href="#" class="text-dark!" rel="follow">
+					{{ props.name }}
 				</a>
 			</h4>
-			<p data-v-c80da821="" class="description text-muted">
-				<a data-v-c80da821="" href="/p/98386.html" class="text-muted" target="_blank" rel="follow"
-				   id="D2B698FF-C334-4A3B-9F84-A276F8A1A95C">超連結密碼不定期更新Koikatu手工分類角色卡下載更改為單包解壓縮可以挑選自己喜歡的以免解壓檔過大下載太久定期更新内容20219月4262-&gt;10月4494-&gt;11月467720221月4996-&gt;3月5279-&gt;6月6025-&gt;12月576120231月6038-&gt;3月6270-…</a>
+			<p class="description text-muted">
+				<a href="#" class="text-muted" rel="follow">{{ props.description }}</a>
 			</p>
-			<div data-v-c80da821="" class="metadata-box">
-				<div data-v-c80da821="" class="cat-info">
-					<a data-v-c80da821="" aria-current="page" href="/reads/acg"
-					   class="router-link-active router-link-exact-active post-list-cat-item b2-radius" target="_blank"
-					   rel="follow" id="4E2C0FA8-4D36-455F-82C1-9CA207A5EAE0" style="color: rgb(235, 80, 126);">专栏区-二次元（ACG）</a>
-				</div>
-
+			<div class="metadata-box">
+				<!--				<div class="cat-info">-->
+				<!--					<a aria-current="page" href="/reads/acg"-->
+				<!--					   class="router-link-active router-link-exact-active post-list-cat-item b2-radius" target="_blank"-->
+				<!--					   rel="follow" id="4E2C0FA8-4D36-455F-82C1-9CA207A5EAE0" style="color: rgb(235, 80, 126);">专栏区-二次元（ACG）</a>-->
+				<!--				</div>-->
 				<!-- 下面是 点赞按钮-->
-				<!--				<a data-v-c80da821="" href="/p/98386.html" class="count-info" target="_blank" rel="follow"-->
-				<!--				   id="6FF0CA0A-C716-4E78-94C3-A8175027E56C">-->
-				<!--					<li data-v-c80da821="" class="count-item Post-list-meta-like"><i data-v-de939e51=""-->
-				<!--					                                                                 data-v-c80da821=""-->
-				<!--					                                                                 class="vikacg-love xs vikacg-icon icon"></i><span-->
-				<!--						data-v-c80da821="" class="value">13</span></li>-->
-				<!--					<li data-v-c80da821="" class="count-item Post-list-meta-comment"><i data-v-de939e51=""-->
-				<!--					                                                                    data-v-c80da821=""-->
-				<!--					                                                                    class="vikacg-comment xs vikacg-icon icon"></i><span-->
-				<!--						data-v-c80da821="" class="value">27</span></li>-->
-				<!--					<li data-v-c80da821="" class="count-item Post-list-meta-views"><i data-v-de939e51=""-->
-				<!--					                                                                  data-v-c80da821=""-->
-				<!--					                                                                  class="vikacg-visibility xs vikacg-icon icon"></i><span-->
-				<!--						data-v-c80da821="" class="value">9.7k</span></li>-->
-				<!--				</a>-->
-
-
+				<!--
+				<a href="/p/98386.html" class="count-info" target="_blank" rel="follow"
+				   id="6FF0CA0A-C716-4E78-94C3-A8175027E56C">
+					<li class="count-item Post-list-meta-like"><i class="vikacg-love xs vikacg-icon icon"></i><span
+						class="value">13</span></li>
+					<li class="count-item Post-list-meta-comment"><i class="vikacg-comment xs vikacg-icon icon"></i><span
+						class="value">27</span></li>
+					<li class="count-item Post-list-meta-views"><i class="vikacg-visibility xs vikacg-icon icon"></i><span
+						class="value">9.7k</span></li>
+				</a>
+				-->
 			</div>
-			<div data-v-c80da821="" class="post-card-author">
-				<div data-v-c80da821="" class="author-info">
-					<a data-v-c80da821="" href="/u/151317" class="post-list-meta-avatar" target="_blank" rel="follow"
-					   id="3BEA8C42-EE12-4A42-B0F9-31C3C90143FD">
-						<img data-v-64dd8889="" data-v-c80da821="" class="avatar avatar-xs only-pc"
-						     src="https://p0.picjs.xyz/2022/06/avatar.jpeg">
-						<span data-v-c80da821="" class="post-user-name">WestApple</span>
+			<div class="post-card-author">
+				<div class="author-info">
+					<a href="#" class="post-list-meta-avatar" rel="follow">
+						<img class="avatar avatar-xs only-pc"
+						     src="https://thirdqq.qlogo.cn/ek_qqapp/AQVDrHCPiaOEZREfUh4MuO93hQ01LMrkvHTX6KAHgF5KaAeBdwX32CaUYZPZqicfc7cCNjN85TJ1ic8qNhX5IicyGkMzBsgPnMia1hVJlFSUULlib2o48Xia5g/100">
+						<span class="post-user-name">Admin</span>
 					</a>
 				</div>
-				<div data-v-c80da821="" class="create-time">2021-9-1</div>
+				<div class="create-time">{{ formatDate(props.date) }}</div>
 			</div>
 		</div>
 	</div>
@@ -76,21 +108,20 @@
 <style scoped lang="scss">
 
 
-
-
 .post-card-item {
 	background-color: #fff;
 	border-radius: 6px;
 	width: calc(33% - 4px);
 	box-shadow: 0 4px 6px -1px rgba(0, 0, 0, .1), 0 2px 4px  -1px rgba(0, 0, 0, .06);
 	//margin-bottom: 12px;
-	margin-bottom: 12px;
 
+	margin: 0 auto 12px;
 
-	a {
+	a, .a-div {
 		color: #344767;
 		letter-spacing: 0;
 		text-decoration: none !important;
+		cursor: pointer;
 
 		.post-card-image {
 			border-radius: 12px 12px 0 0 !important;
@@ -106,11 +137,12 @@
 			position: relative;
 
 			.arco-image-img {
-				border-radius: 0;
+				//border-radius: 0;
 				height: 100%;
 				width: 100%;
 				vertical-align: center;
 				object-fit: cover;
+				border-radius: 8px;
 			}
 
 			.arco-image-footer {

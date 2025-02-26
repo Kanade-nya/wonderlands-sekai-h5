@@ -5,6 +5,7 @@ const route = useRoute();
 import BoxComponent from "@/components/home/BoxComponent.vue";
 import FilterPanel from "@/components/common/FilterPanel.vue";
 import CollectionBox from "@/components/collection/CollectionBox.vue";
+import CollectionContainer from "@/components/collection/CollectionContainer.vue";
 
 // import router from "@/router/router.js";
 
@@ -17,12 +18,6 @@ onMounted(() => {
 
 <template>
 	<filter-panel></filter-panel>
-	<div style="display: flex;flex-wrap: wrap;gap: 6px;justify-content: space-between">
-		<CollectionBox></CollectionBox>
-		<CollectionBox></CollectionBox>
-		<CollectionBox></CollectionBox>
-		<CollectionBox></CollectionBox>
-	</div>
 
 	<box-component></box-component>
 </template>

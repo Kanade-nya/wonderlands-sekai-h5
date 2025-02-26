@@ -16,6 +16,11 @@ const jump2Comments = () => {
 	router.push('/comments')
 	emits('change-menu', 'false')
 }
+
+const jump2Collection = () => {
+	router.push('/c/box')
+	emits('change-menu', 'false')
+}
 // const handleClick = (item: String) => {
 // 	if (item === 'Leo/need') {
 // 		router.push({
@@ -53,6 +58,11 @@ const emits = defineEmits(['change-menu'])
 			<el-link :underline="false" @click="jump2About" class="link">
 				<div class="grid-item bar-about">
 					<span>关于</span>
+				</div>
+			</el-link>
+			<el-link :underline="false" @click="jump2Collection" class="link">
+				<div class="grid-item bar-about">
+					<span>合集</span>
 				</div>
 			</el-link>
 			<div class="link"></div>
