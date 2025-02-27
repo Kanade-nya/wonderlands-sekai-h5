@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup >
 
 import CollectionContainer from "@/components/collection/CollectionContainer.vue";
 </script>

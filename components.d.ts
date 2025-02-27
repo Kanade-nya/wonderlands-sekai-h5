@@ -10,7 +10,6 @@ declare module 'vue' {
     BoxComponent: typeof import('./src/components/home/BoxComponent.vue')['default']
     BoxContent: typeof import('./src/components/home/BoxContent.vue')['default']
     CollectionBox: typeof import('./src/components/collection/CollectionBox.vue')['default']
-    CollectionBoxDetail: typeof import('./src/components/collection/CollectionBoxDetail.vue')['default']
     CollectionContainer: typeof import('./src/components/collection/CollectionContainer.vue')['default']
     CollectionDetail: typeof import('./src/components/collection/CollectionDetail.vue')['default']
     CollectionDetailChildren: typeof import('./src/components/collection/CollectionDetailChildren.vue')['default']

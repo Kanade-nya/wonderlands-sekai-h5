@@ -162,7 +162,7 @@ const searchInfo = (search_query) =>{
 			<slot name="center">WONDERLANDS×SEKAI</slot>
 		</span>
 
-		<span class="website-name phone" @click="jump2Home">
+		<span class="website-name phone" @click="jump2Home" style="cursor: pointer;">
 			<slot name="center">W×SEKAI</slot>
 		</span>
 

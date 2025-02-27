@@ -18,6 +18,9 @@ const jump = () => {
 		SpringBoot 驱动
 	</el-text>
 	<br>
+	<el-text>新功能的建议和意见提交链接：</el-text><el-link href="https://docs.qq.com/form/page/DWU1YRkZUZkh0UWVI" target="_blank">【腾讯文档】新功能调研</el-link>
+	<br>
+	<br>
 	<el-text>由于神秘的力量，当页面显示不全时尝试刷新</el-text>
 	<h3>分类</h3>
 	<el-text>使用了六个一级分类：

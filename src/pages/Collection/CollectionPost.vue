@@ -35,7 +35,7 @@
 					class="data-form"
 				>
 					<el-form-item label="名称">
-						<el-input v-model="formData.name" placeholder="请输入合集名称"/>
+						<el-input v-model="formData.name" placeholder="请输入合集名称" style="font-family: 'Noto Serif SC', sans-serif ; !important;" />
 					</el-form-item>
 
 					<el-form-item label="描述">
@@ -96,7 +96,7 @@ const handleSearch = async (value) => {
 		`${baseUrl}/api2/website_image/page`,
 		{
 			page_id: 1,
-			page_size: 12,
+			page_size: 120,
 			search_content: value,
 			search_type: 'all'
 		}
@@ -216,6 +216,10 @@ const removeImage = (index) => {
 			.el-select,
 			.el-input {
 				width: 100%;
+				:deep(.el-input__inner){
+					font-family: "Noto Serif SC", sans-serif !important;
+				}
+				font-family: "Noto Serif SC", sans-serif !important;
 			}
 		}
 

@@ -1,5 +1,5 @@
 <!--具体实现-->
-<script setup lang="ts">
+<script setup >
 import {ref, onMounted, onBeforeUnmount,computed} from 'vue'
 import {useRouter, useRoute} from 'vue-router'
 import requests from '@/utils/requests'

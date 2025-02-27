@@ -168,6 +168,10 @@ const routes = [
     {
         path: '/c',
         name: 'collection',
+        beforeEnter: (to, from, next) => {
+            document.title = 'Wonderlands×Sekai⭐Collection!'
+            next()
+        },
         children: [
             {
                 path: 'box',

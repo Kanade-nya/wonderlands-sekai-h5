@@ -10,12 +10,12 @@
 	</u-comment>
 </template>
 
-<script setup lang="ts">
+<script setup >
 import { reactive } from 'vue'
 import { UToast, Time, CommentApi, CommentSubmitApi, ConfigApi } from 'undraw-ui'
 
-const config = reactive<ConfigApi>({
-	user: {} as any, // 当前用户信息
+const config = reactive({
+	user: {} , // 当前用户信息
 	comments: [], // 评论数据
 	relativeTime: true, // 开启人性化时间
 	show: {
@@ -103,12 +103,12 @@ setTimeout(() => {
 // 评论提交事件
 let temp_id = 100
 // 提交评论事件
-const submit = ({ content, parentId, finish }: CommentSubmitApi) => {
+const submit = ({ content, parentId, finish }) => {
 	let str = '提交评论:' + content + ';\t父id: ' + parentId
 	console.log(str)
 
 	// 模拟请求接口生成数据
-	const comment: CommentApi = {
+	const comment = {
 		id: String((temp_id += 1)),
 		parentId: parentId,
 		uid: config.user.id,

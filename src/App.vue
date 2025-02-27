@@ -15,7 +15,10 @@ const getIpStore = useGetIpStore();
 onMounted(()=>{
 	getIpStore.setIp()
 	console.log(`Location: ${getIpStore.getIp()}`)
+
 })
+
+
 </script>
 
 <template>

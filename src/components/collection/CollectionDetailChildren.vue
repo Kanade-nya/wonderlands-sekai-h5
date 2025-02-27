@@ -34,6 +34,7 @@
 		<div class="image-list">
 			<h3 style="margin: 4px 0">Image</h3>
 			<p style="margin: 4px 0">画师： {{ props.details.artiest }}</p>
+			<p style="margin: 4px 0 " class="jump-link " @click="jumpLink"> Link</p>
 			<div class="image-list-container">
 				<!--				<img src="@/assets/img_1.png" class="listed-image">-->
 				<!--				<img src="@/assets/e0a9ce33a7fef53e5557e9bc2b9dafbe3546749308242173.jpg" class="listed-image">-->
@@ -56,7 +57,9 @@
 <script setup>
 import {ref,onMounted,defineProps} from "vue";
 import {parseImageUrl} from "@/utils/methods.js";
+import {useRouter} from "vue-router";
 
+const router = useRouter()
 const props = defineProps({
 	details: {
 		type: Array,
@@ -78,6 +81,12 @@ const getPreviewImages = (index) => {
 	let start = tempImgList.splice(index);
 	let remain = tempImgList.splice(0, index);
 	return start.concat(remain);
+}
+
+const jumpLink = () => {
+	router.push(
+		`/details/${props.details.id}`
+	)
 }
 </script>
 
@@ -115,6 +124,12 @@ const getPreviewImages = (index) => {
 .page-container {
 	width: 100%;
 	//padding: 20px;
+	.jump-link{
+		cursor: pointer;
+		&:hover{
+			color: #cc99cd;
+		}
+	}
 	h3 {
 		margin-top: 0;
 	}

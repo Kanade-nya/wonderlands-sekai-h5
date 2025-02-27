@@ -1,6 +1,6 @@
 <!--合集功能的BOX-->
 
-<script setup lang="ts">
+<script setup >
 import {ref, defineProps} from 'vue'
 import {useRouter} from "vue-router";
 
@@ -31,7 +31,7 @@ const props = defineProps({
 
 console.log('props', props)
 
-const formatDate = (dateString: string): string => {
+const formatDate = (dateString) => {
 	const date = new Date(dateString)
 	const year = date.getFullYear()
 	const month = date.getMonth() + 1 // 月份从0开始，需要加1

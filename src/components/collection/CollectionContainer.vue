@@ -1,15 +1,20 @@
-<script setup lang="ts">
+<script setup >
 
 import CollectionBox from "@/components/collection/CollectionBox.vue";
 
 import {localUrl} from '@/utils/methods'
 import requests from "@/utils/requests.js";
 import {onMounted, ref} from 'vue';
+import {ElLoading} from "element-plus";
 
 onMounted(async () => {
+	let firstLoading = ElLoading.service({
+		text: '少女祈祷中...'
+	});
 	const response = await requests.get(
 		`${localUrl}/collections/`
 	)
+	firstLoading.close()
 	const {list, total} = response.data
 	refList.value = list
 	refTotal.value = total
