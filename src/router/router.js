@@ -143,18 +143,18 @@ const routes = [
         component: () => import('@/pages/Search.vue')
     },
     {
-        path: '/u',
-        name: 'u',
+        path: '/user',
+        name: 'User',
         children: [
             {
                 path: 'register',
-                name: 'register',
-                component: () => import('@/pages/User/UserRegister.vue'),
+                name: 'UserRegister',
+                component: () => import('@/pages/User/UserNewNewRegister.vue'),
             },
             {
                 path: 'login',
-                name: 'login',
-                component: () => import('@/pages/User/UserLogin.vue'),
+                name: 'UserLogin',
+                component: () => import('@/pages/User/UserNewLogin.vue'),
             },
             {
                 path: 'comments',

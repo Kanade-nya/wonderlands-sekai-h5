@@ -5,24 +5,60 @@ import NavBar from "@/components/common/NavBar.vue";
 import Home from "@/pages/Home.vue";
 import FooterBar from "@/components/common/FooterBar.vue";
 import Token from "@/pages/Token.vue";
+import {computed} from "vue";
 
 import {useRoute} from "vue-router";
 const route = useRoute();
 
 import {onMounted} from "vue";
 import {useGetIpStore} from "@/stores/useGetIpStore.js";
+import axios from "axios";
+import {ElMessage} from "element-plus";
 const getIpStore = useGetIpStore();
 onMounted(()=>{
 	getIpStore.setIp()
 	console.log(`Location: ${getIpStore.getIp()}`)
+	console.log(route.path)
 
+	const token = localStorage.getItem('access_token')
+	if (!token) {
+		console.log('没有token')
+	}else{
+		axios.get('http://127.0.0.1:8000/protected', {
+			headers: {
+				Authorization: `Bearer ${token}`
+			}
+		}).then(response => {
+			console.log(response)
+
+			if (response.status === 200) {
+				ElMessage.success(`欢迎回来，${response.data.user_info.username}`)
+				return true;
+			} else {
+				localStorage.removeItem('access_token');
+				return false;
+			}
+		})
+	}
 })
-
+const currentRoute = computed(()=>{
+	return route.path.startsWith('/user')
+})
 
 </script>
 
 <template>
-	<div class="main-body">
+	<div v-if="currentRoute">
+		<div class="full-main-body">
+			<div class="full-main-page-bg">
+				<div class="main-page-layout">
+					<router-view :key="route.fullPath"></router-view>
+				</div>
+			</div>
+			<FooterBar></FooterBar>
+		</div>
+	</div>
+	<div class="main-body" v-else>
 		<NavBar></NavBar>
 		<div class="main-page-bg">
 			<div class="main-page-layout">
@@ -46,6 +82,9 @@ onMounted(()=>{
 </template>
 
 <style scoped lang="scss">
+.full-main-body{
+
+}
 .main-body{
 	overflow: visible;
 }

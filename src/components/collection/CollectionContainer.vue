@@ -13,7 +13,15 @@ onMounted(async () => {
 	});
 	const response = await requests.get(
 		`${localUrl}/collections/`
-	)
+	).catch(error => {
+		firstLoading.close()
+		ElMessage.error({
+			message: '出现神秘错误，刷新中...',
+			type: 'error',
+			duration: 2000
+		})
+		location.reload()
+	})
 	firstLoading.close()
 	const {list, total} = response.data
 	refList.value = list
