@@ -12,9 +12,14 @@ const route = useRoute();
 
 import {onMounted} from "vue";
 import {useGetIpStore} from "@/stores/useGetIpStore.js";
+import {useUserInfoStore} from "@/stores/useUserInfoStroe.js";
+
 import axios from "axios";
 import {ElMessage} from "element-plus";
+
 const getIpStore = useGetIpStore();
+const useUserInfo = useUserInfoStore();
+
 onMounted(()=>{
 	getIpStore.setIp()
 	console.log(`Location: ${getIpStore.getIp()}`)
@@ -22,7 +27,7 @@ onMounted(()=>{
 
 	const token = localStorage.getItem('access_token')
 	if (!token) {
-		console.log('没有token')
+		console.log('没有token，去登录')
 	}else{
 		axios.get('http://127.0.0.1:8000/protected', {
 			headers: {
@@ -33,9 +38,9 @@ onMounted(()=>{
 
 			if (response.status === 200) {
 				ElMessage.success(`欢迎回来，${response.data.user_info.username}`)
+				useUserInfo.setUserInfo(response.data.user_info)
 				return true;
 			} else {
-				localStorage.removeItem('access_token');
 				return false;
 			}
 		})

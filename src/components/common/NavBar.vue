@@ -245,6 +245,10 @@ const searchInfo = (search_query) =>{
 				></search-input>
 			</div>
 
+			<div class="avatar-div">
+				<el-avatar :size="30"></el-avatar>
+			</div>
+
 
 			<button class="menu-btn" v-if="userAgent !== 'PC'" @click="onPhoneClick">
 				<el-icon :size="20">

@@ -160,10 +160,13 @@ const routes = [
                 path: 'comments',
                 name: 'userComments',
                 component: () => import('@/pages/User/UserComments.vue')
+            },
+            {
+                path: 'profile',
+                name: 'userProfile',
+                component: () => import('@/pages/User/Profile/UserProfileContainer.vue'),
             }
         ]
-
-
     },
     {
         path: '/c',

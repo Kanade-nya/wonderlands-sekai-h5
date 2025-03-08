@@ -1,3 +1,4 @@
+<!-- 具体的图片链接-->
 <template>
 	<div class="page-container">
 		<details-title
@@ -49,15 +50,24 @@
 				</div>
 			</div>
 		</div>
+		<!--	tags区域	-->
+		<div v-if="tags.length !== 0" class="tags">
+			<h3>Tags</h3>
+			<div class="tags-container">
+				<el-tag v-for="item in tags" size="large" type="info" >{{item}}</el-tag>
+			</div>
+		</div>
 		<!--		评论区域-->
-		<Waline :serverURL="serverURL" :path="path" :reaction="[]"/>
+		<div class="comments">
+			<Waline :serverURL="serverURL" :path="path" :reaction="[]"/>
+		</div>
 	</div>
 </template>
 
 <script setup>
 import {computed, onMounted, ref} from 'vue';
 import DetailsTitle from "@/components/details/DetailsTitle.vue";
-import {baseUrl, imageUrl} from "@/utils/methods.js";
+import {baseUrl, imageUrl, localUrl} from "@/utils/methods.js";
 
 
 // Waline评论面板
@@ -77,6 +87,7 @@ const path = computed(() => useRoute().path);
 
 // const imageUrl = ref('https://lingma-vl.oss-rg-china-mainland.aliyuncs.com/cloud/CPlxwF91fytKRrml8tR004190ZvojZlzmU6U0P3s2ZM/0e408adf-4593-4195-ae29-6b4b97d7d150_1736484421300.png'); // 替换为实际的宣传图地址
 const box = ref({})
+const tags = ref([])
 
 const getPreviewImages = (index) => {
 	let tempImgList = [...box.value.image_url];//所有图片地址
@@ -127,6 +138,14 @@ onMounted(() => {
 			box.value.description = box.value.description.replace(/\n/g, '<br>')
 		}
 		firstLoading.close()
+		requests.get(
+			`${localUrl}/tags/images/${props.id}/tags`
+		).then(response => {
+			if (response.status === 200) {
+				console.log(response.data)
+				tags.value = response.data.tags
+			}
+		})
 	})
 })
 
@@ -161,10 +180,34 @@ onMounted(() => {
 }
 
 .page-container {
+
 	width: 100%;
 	//padding: 20px;
 	h3 {
 		margin-top: 0;
+	}
+
+	.tags{
+		h3{
+			border-bottom: 1px solid #ccc;
+			padding-bottom: 5px;
+		}
+		.tags-container{
+			display: flex;
+			justify-content: left;
+			flex-wrap: wrap;
+			gap: 12px;
+			span{
+				cursor: pointer;
+				color: #61666D;
+			}
+		}
+
+		margin-top: 20px;
+		padding: 12px 20px;
+		//background-color: rgba(255, 192, 203, 0.2);
+		background-color: rgba(240, 248, 255, 0.3);
+		border-radius: 10px;
 	}
 
 	.header {
@@ -289,6 +332,10 @@ onMounted(() => {
 			}
 		}
 	}
+}
+.comments{
+	margin-left: -0.5em;
+	margin-right: -0.5em;
 }
 </style>
 
