@@ -4,9 +4,12 @@ export const useUserInfoStore = defineStore('userInfo', {
     state: () => {
         return {
             userInfo: {
+                userId: '',
                 userName: '',
                 userIsActive: false,
-                userAvatar: ''
+                userAvatar: '',
+                userDescription: '',
+                userBlog: ''
             }
         }
     },
@@ -15,9 +18,12 @@ export const useUserInfoStore = defineStore('userInfo', {
     },
     actions: {
         setUserInfo(data) {
+            this.userInfo.userId = data.id;
             this.userInfo.userName = data.username;
             this.userInfo.userIsActive = data.is_active;
-            this.userInfo.userAvatar = data.avatar
+            this.userInfo.userAvatar = data.avatar;
+            this.userInfo.userDescription = data.description;
+            this.userInfo.userBlog = data.blog;
         },
         clearUserInfo() {
             this.userInfo = {

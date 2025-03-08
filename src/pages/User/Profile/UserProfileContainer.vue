@@ -3,8 +3,14 @@ import {ref} from "vue";
 import UserProfileMain from "@/pages/User/Profile/UserProfileMain.vue";
 import {ArrowLeft} from "@element-plus/icons-vue";
 import UserProfileAvatar from "@/pages/User/Profile/UserProfileAvatar.vue";
+import {useRouter} from "vue-router";
+
+const router = useRouter()
 
 const activeName = ref('first');
+const handleClick = () => {
+	router.back()
+}
 </script>
 
 <template>
@@ -12,7 +18,7 @@ const activeName = ref('first');
 		<el-card>
 			<template #header>
 				<div class="header">
-					<el-button class="back-button" :icon="ArrowLeft" text> 资料</el-button>
+					<el-button class="back-button" :icon="ArrowLeft" text @click="handleClick"> 资料</el-button>
 				</div>
 			</template>
 			<el-tabs v-model="activeName" class="demo-tabs" @tab-click="handleClick">

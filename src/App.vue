@@ -12,7 +12,7 @@ const route = useRoute();
 
 import {onMounted} from "vue";
 import {useGetIpStore} from "@/stores/useGetIpStore.js";
-import {useUserInfoStore} from "@/stores/useUserInfoStroe.js";
+import {useUserInfoStore} from "@/stores/useUserInfoStore.js";
 
 import axios from "axios";
 import {ElMessage} from "element-plus";

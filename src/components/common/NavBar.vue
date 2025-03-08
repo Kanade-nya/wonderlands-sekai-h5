@@ -12,6 +12,8 @@ import {useRouter} from "vue-router";
 import MenuPanel from "@/components/common/MenuPanel.vue";
 import SearchInput from "@/components/common/SearchInput.vue";
 import PhonePanel from "@/components/common/PhonePanel.vue";
+import {useUserInfoStore} from "@/stores/useUserInfoStore.js";
+const userInfoStore = useUserInfoStore();
 
 const router = useRouter();
 
@@ -148,6 +150,14 @@ const searchInfo = (search_query) =>{
 		}
 	)
 }
+
+const onAvatarClick = () => {
+	if (userInfoStore.getUserInfo.userName !== '') {
+		router.push('/user/profile')
+	} else {
+		router.push('/user/login')
+	}
+}
 </script>
 
 <template>
@@ -245,8 +255,8 @@ const searchInfo = (search_query) =>{
 				></search-input>
 			</div>
 
-			<div class="avatar-div">
-				<el-avatar :size="30"></el-avatar>
+			<div class="avatar-div" @click="onAvatarClick">
+				<el-avatar :size="30" :src="userInfoStore.getUserInfo.userAvatar"></el-avatar>
 			</div>
 
 

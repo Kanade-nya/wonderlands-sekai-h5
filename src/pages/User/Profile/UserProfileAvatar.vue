@@ -1,16 +1,17 @@
 <script setup>
 import {ref, onMounted} from 'vue'
 import TencentCosUpload from "@/components/common/TencentCosUpload.vue";
-import {useUserInfoStore} from "@/stores/useUserInfoStroe.js";
+import {useUserInfoStore} from "@/stores/useUserInfoStore.js";
 import requests from '@/utils/requests.js'
 import {localUrl} from "@/utils/methods.js";
-
-const store = useUserInfoStore()
 const localAvatar = ref('')
+const store = useUserInfoStore()
+localAvatar.value = store.getUserInfo.userAvatar
+
 const getUserAvatar = async (avaUrl) => {
 	const token = localStorage.getItem('access_token')
 	const response = await requests.post(
-		`${localUrl}/user/uploader-avatar`,
+		`${localUrl}/user/upload-avatar`,
 		{
 			"avatar_url": `https://${avaUrl}`
 		},
@@ -31,7 +32,7 @@ const getUserAvatar = async (avaUrl) => {
 console.log(store.getUserInfo)
 onMounted(() => {
 	console.log(localAvatar.value)
-	localAvatar.value = store.getUserInfo.userAvatar
+
 	console.log(localAvatar.value)
 })
 </script>
