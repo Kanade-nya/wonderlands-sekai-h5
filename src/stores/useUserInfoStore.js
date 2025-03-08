@@ -25,6 +25,9 @@ export const useUserInfoStore = defineStore('userInfo', {
             this.userInfo.userDescription = data.description;
             this.userInfo.userBlog = data.blog;
         },
+        setUserAvatar(data) {
+            this.userInfo.userAvatar = data;
+        },
         clearUserInfo() {
             this.userInfo = {
                 userId: '',

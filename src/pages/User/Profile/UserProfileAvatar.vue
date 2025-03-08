@@ -23,6 +23,7 @@ const getUserAvatar = async (avaUrl) => {
 	)
 	if (response.status === 200) {
 		localAvatar.value = `https://${avaUrl}`
+		store.setUserAvatar(localAvatar.value)
 	} else {
 		ElMessage.error('更新服务器失败')
 	}

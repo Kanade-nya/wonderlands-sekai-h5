@@ -21,7 +21,7 @@ const handleClick = () => {
 					<el-button class="back-button" :icon="ArrowLeft" text @click="handleClick"> 资料</el-button>
 				</div>
 			</template>
-			<el-tabs v-model="activeName" class="demo-tabs" @tab-click="handleClick">
+			<el-tabs v-model="activeName" class="demo-tabs">
 				<el-tab-pane label="基本资料" name="first"><user-profile-main></user-profile-main></el-tab-pane>
 				<el-tab-pane label="头像管理" name="second"><user-profile-avatar></user-profile-avatar></el-tab-pane>
 				<el-tab-pane label="Role" name="third">Role</el-tab-pane>

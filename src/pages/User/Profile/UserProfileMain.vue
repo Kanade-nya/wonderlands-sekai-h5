@@ -6,18 +6,18 @@
 				<!-- Nickname -->
 				<div class="form-item">
 					<div class="label">昵称</div>
-					<el-input v-model="profile.nickname" placeholder="miiro" class="form-input" />
+					<el-input v-model="profile.nickname" placeholder="取一个好听的名字" class="form-input" />
 				</div>
 
-				<!-- Gender -->
-				<div class="form-item">
-					<div class="label">性别</div>
-					<div class="gender-options">
-						<el-radio v-model="profile.gender" label="unknown" class="gender-radio">未知</el-radio>
-						<el-radio v-model="profile.gender" label="male" class="gender-radio">男</el-radio>
-						<el-radio v-model="profile.gender" label="female" class="gender-radio">女</el-radio>
-					</div>
-				</div>
+<!--				&lt;!&ndash; Gender &ndash;&gt;-->
+<!--				<div class="form-item">-->
+<!--					<div class="label">性别</div>-->
+<!--					<div class="gender-options">-->
+<!--						<el-radio v-model="profile.gender" label="unknown" class="gender-radio">未知</el-radio>-->
+<!--						<el-radio v-model="profile.gender" label="male" class="gender-radio">男</el-radio>-->
+<!--						<el-radio v-model="profile.gender" label="female" class="gender-radio">女</el-radio>-->
+<!--					</div>-->
+<!--				</div>-->
 
 				<!-- Website -->
 				<div class="form-item">
@@ -53,15 +53,23 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref ,onMounted} from 'vue';
 import {ArrowLeft} from "@element-plus/icons-vue";
+import {useUserInfoStore} from "@/stores/useUserInfoStore.js";
+
+const userInfoStore = useUserInfoStore();
 
 const profile = ref({
 	nickname: 'miiro',
-	gender: 'unknown',
+	// gender: 'unknown',
 	website: '',
 	introduction: ''
 });
+onMounted(()=>{
+	profile.value.nickname = userInfoStore.getUserInfo.userName;
+	profile.value.website = userInfoStore.getUserInfo.userBlog;
+	profile.value.introduction = userInfoStore.getUserInfo.description;
+})
 
 
 </script>

@@ -1,6 +1,6 @@
 <!-- src/components/Banner.vue -->
 <script setup>
-import {ref, defineProps} from 'vue';
+import {ref, defineProps,onUnmounted} from 'vue';
 import {ArrowDown, Back, Operation, UserFilled} from "@element-plus/icons-vue";
 // import GridRow from "@/components/grid/GridRow.vue";
 import VerticalMenu from "@/components/grid/VerticalMenu.vue";
@@ -13,6 +13,7 @@ import MenuPanel from "@/components/common/MenuPanel.vue";
 import SearchInput from "@/components/common/SearchInput.vue";
 import PhonePanel from "@/components/common/PhonePanel.vue";
 import {useUserInfoStore} from "@/stores/useUserInfoStore.js";
+import UserMenuPanel from "@/components/common/UserMenuPanel.vue";
 const userInfoStore = useUserInfoStore();
 
 const router = useRouter();
@@ -151,13 +152,41 @@ const searchInfo = (search_query) =>{
 	)
 }
 
+// User menu hover functionality
+const isUserMenuVisible = ref(false);
+let hoverTimer = null;
+
+const showUserMenu = () => {
+	clearTimeout(hoverTimer);
+	isUserMenuVisible.value = true;
+};
+
+const hideUserMenu = () => {
+	hoverTimer = setTimeout(() => {
+		isUserMenuVisible.value = false;
+	}, 300);
+};
+
+const cancelHideUserMenu = () => {
+	clearTimeout(hoverTimer);
+};
+
+const forceHideUserMenu = () => {
+	isUserMenuVisible.value = false;
+};
+
 const onAvatarClick = () => {
 	if (userInfoStore.getUserInfo.userName !== '') {
-		router.push('/user/profile')
+		isUserMenuVisible.value = !isUserMenuVisible.value;
 	} else {
-		router.push('/user/login')
+		router.push('/user/login');
 	}
 }
+
+// Clean up any timers on unmount
+onUnmounted(() => {
+	clearTimeout(hoverTimer);
+});
 </script>
 
 <template>
@@ -255,8 +284,24 @@ const onAvatarClick = () => {
 				></search-input>
 			</div>
 
-			<div class="avatar-div" @click="onAvatarClick">
-				<el-avatar :size="30" :src="userInfoStore.getUserInfo.userAvatar"></el-avatar>
+			<div
+				class="avatar-div"
+				@mouseenter="showUserMenu"
+				@mouseleave="hideUserMenu"
+			>
+				<el-avatar :size="30" :src="userInfoStore.getUserInfo.userAvatar" @click="onAvatarClick"></el-avatar>
+				<transition
+					name="fade"
+					class="user-panel"
+				>
+					<!-- User menu panel on hover -->
+					<UserMenuPanel
+						:visible="isUserMenuVisible"
+						@mouseenter="cancelHideUserMenu"
+						@mouseleave="hideUserMenu"
+						@close="forceHideUserMenu"
+					/>
+				</transition>
 			</div>
 
 
@@ -290,6 +335,81 @@ const onAvatarClick = () => {
 
 
 <style lang="scss" scoped>
+.user-panel {
+	position: absolute;
+	top: 48px;
+	right: 4px;
+	z-index: 1000;
+}
+
+.user-panel-content {
+	background-color: white;
+	border: 1px solid #e4e7ed;
+	border-radius: 6px;
+	box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12), 0 4px 8px rgba(0, 0, 0, 0.06);
+	padding: 20px;
+	width: 240px;
+}
+
+.user-info {
+	display: flex;
+	align-items: center;
+	margin-bottom: 20px;
+}
+
+.user-details {
+	margin-left: 15px;
+}
+
+h3 {
+	font-size: 18px;
+	margin-bottom: 5px;
+}
+
+.level-and-stats {
+	font-size: 14px;
+	color: #606266;
+}
+
+.level-tag {
+	background-color: #f0f4f9;
+	color: #1f88e8;
+	border-radius: 2px;
+	padding: 2px 6px;
+	margin-right: 5px;
+}
+
+.panel-menu {
+	border: none;
+}
+
+.panel-menu .el-menu-item {
+	height: auto;
+	padding: 10px 0;
+	display: flex;
+	align-items: center;
+}
+
+.panel-menu  .el-menu-item i {
+	margin-right: 10px;
+	font-size: 18px;
+}
+
+.panel-menu  .sub-text {
+	font-size: 12px;
+	color: #606266;
+	display: block;
+	margin-top: 5px;
+}
+
+.logout-item {
+	border-top: 1px solid #e4e7ed;
+	margin-top: 15px;
+	padding-top: 10px;
+	text-align: center;
+	color: #f5222d;
+	cursor: pointer;
+}
 .span-icon {
 	//height: 20px;
 	display: flex;
@@ -430,7 +550,8 @@ const onAvatarClick = () => {
 	margin-left: auto;
 
 	.avatar-div {
-		margin-right: 8px;
+		padding: 8px 16px 8px 8px;
+		//margin-right: 8px;
 		display: flex;
 		flex-direction: column;
 		justify-content: center;
