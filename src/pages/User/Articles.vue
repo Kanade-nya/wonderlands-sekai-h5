@@ -3,9 +3,9 @@
 		<div v-for="article in articles" :key="article.id" class="article-item">
 			<!-- Article with image on left -->
 			<div class="article-content">
-				<div class="article-image" v-if="article.image">
-					<img :src="article.image" :alt="article.title">
-				</div>
+<!--				<div class="article-image" v-if="article.image">-->
+<!--					<img :src="article.image" :alt="article.title">-->
+<!--				</div>-->
 				<div class="article-info" :class="{ 'full-width': !article.image }">
 					<h3 class="article-title">{{ article.title }}</h3>
 					<div class="article-meta">
@@ -23,6 +23,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import Mock from 'mockjs';
+import axios from "axios";
 
 // Setup mock data
 const setupMockData = () => {
@@ -44,8 +45,9 @@ const fetchArticles = async () => {
 	setupMockData();
 	try {
 		// In a real app, you would use axios or fetch
-		const response = await Mock.mock('/api/articles');
-		articles.value = response.articles.map(article => {
+		const response = await axios.get('/api/articles');
+		console.log(response)
+		articles.value = response.data.articles.map(article => {
 			// Generate random images only for some articles
 			if (article.image > 3) {
 				article.image = `https://picsum.photos/id/${Math.floor(Math.random() * 100)}/200/120`;

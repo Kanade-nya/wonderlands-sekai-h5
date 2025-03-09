@@ -11,15 +11,15 @@
 					<div class="article-meta">
 						<div class="author-info">
 							<img :src="article.authorAvatar" class="author-avatar" alt="author avatar">
-							<span class="author">{{ article.author }}</span>
+							<span class="author">{{ article.author_name }}</span>
 						</div>
 						<div class="article-stats">
-							<span class="stat-item">文章数: {{ article.articleCount }}</span>
-							<span class="stat-item">阅读: {{ article.readCount }}</span>
-							<span class="stat-item">{{ article.time }}</span>
+<!--							<span class="stat-item">文章数: {{ article.articleCount }}</span>-->
+<!--							<span class="stat-item">阅读: {{ article.readCount }}</span>-->
+							<span class="stat-item">{{ article.create_date }}</span>
 						</div>
 					</div>
-					<p class="article-summary">{{ article.summary }}</p>
+					<p class="article-summary">{{ article.content }}</p>
 				</div>
 			</div>
 		</div>
@@ -31,6 +31,7 @@ import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import Mock from 'mockjs';
 import axios from "axios";
+import {localUrl} from "@/utils/methods.js";
 
 const router = useRouter();
 
@@ -61,9 +62,9 @@ const articles = ref([]);
 const fetchArticles = async () => {
 	setupMockData();
 	try {
-		const response = await axios.get('/api/articles');
+		const response = await axios.get(localUrl + '/articles/articles');
 		console.log('response: ',response)
-		articles.value = response.data.articles.map(article => {
+		articles.value = response.data.map(article => {
 			// Generate random images only for some articles
 			if (article.image > 3) {
 				article.image = `https://picsum.photos/id/${Math.floor(Math.random() * 100)}/200/120`;
@@ -79,7 +80,9 @@ const fetchArticles = async () => {
 
 // Navigate to article detail
 const goToArticle = (id) => {
-	router.push({ name: 'ArticleDetail', params: { id } });
+	router.push({
+		name: 'articleDetail', params: { id }
+	});
 };
 
 onMounted(() => {
@@ -99,7 +102,7 @@ onMounted(() => {
 		margin-bottom: 20px;
 		border-radius: 8px;
 		background-color: white;
-		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+		box-shadow: 0 4px 6px -1px rgba(0, 0, 0, .1), 0 2px 4px -1px rgba(0, 0, 0, .06);
 		cursor: pointer;
 		transition: transform 0.2s, box-shadow 0.2s;
 

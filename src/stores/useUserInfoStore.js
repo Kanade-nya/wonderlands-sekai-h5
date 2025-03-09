@@ -9,7 +9,9 @@ export const useUserInfoStore = defineStore('userInfo', {
                 userIsActive: false,
                 userAvatar: '',
                 userDescription: '',
-                userBlog: ''
+                userBlog: '',
+                isLogin: false,
+                loadingSuccess: false
             }
         }
     },
@@ -24,6 +26,8 @@ export const useUserInfoStore = defineStore('userInfo', {
             this.userInfo.userAvatar = data.avatar;
             this.userInfo.userDescription = data.description;
             this.userInfo.userBlog = data.blog;
+            this.userInfo.isLogin = true;
+            this.userInfo.loadingSuccess = true;
         },
         setUserAvatar(data) {
             this.userInfo.userAvatar = data;

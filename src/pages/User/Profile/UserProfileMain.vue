@@ -31,7 +31,7 @@
 					<el-input
 						v-model="profile.introduction"
 						type="textarea"
-						placeholder="吐友自己的个人简介.txt"
+						placeholder="自己的个人简介.txt"
 						class="form-textarea"
 						:rows="4"
 					/>

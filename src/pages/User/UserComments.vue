@@ -10,12 +10,16 @@
 	</u-comment>
 </template>
 
-<script setup >
-import { reactive } from 'vue'
-import { UToast, Time, CommentApi, CommentSubmitApi, ConfigApi } from 'undraw-ui'
+<script setup>
+import {reactive, onMounted, ref} from 'vue'
+import {UToast, Time} from 'undraw-ui'
+import {useUserInfoStore} from "@/stores/useUserInfoStore.js";
+
+const userInfoStore = useUserInfoStore()
+const isLogin = ref(false)
 
 const config = reactive({
-	user: {} , // 当前用户信息
+	user: {}, // 当前用户信息
 	comments: [], // 评论数据
 	relativeTime: true, // 开启人性化时间
 	show: {
@@ -89,24 +93,49 @@ const comments = [
 	}
 ]
 
-// 模拟请求接口获取评论数据
-setTimeout(() => {
-	// 当前登录用户数据
-	config.user = {
-		id: 1,
-		username: '杜甫 [唐代]',
-		avatar: 'https://static.juzicon.com/images/image-180327173755-IELJ.jpg',
+// // 模拟请求接口获取评论数据
+// setTimeout(() => {
+// 	// 当前登录用户数据
+// 	config.user = {
+// 		id: 1,
+// 		username: '杜甫 [唐代]',
+// 		avatar: 'https://static.juzicon.com/images/image-180327173755-IELJ.jpg',
+// 	}
+// 	config.comments = comments
+// }, 500)
+const loadUserInfo = () => {
+	console.log(userInfoStore)
+	if (userInfoStore.userInfo.loadingSuccess) { // 判断pinia加载
+		console.log(111)
+		if (!userInfoStore.userInfo.isLogin) {
+			console.log('未登录')
+		} else{
+			config.user = {
+				id: userInfoStore.userInfo.userId,
+				username: userInfoStore.userInfo.userName,
+				avatar: userInfoStore.userInfo.userAvatar,
+			}
+			isLogin.value = true
+		}
+	}else {
+		setTimeout(() => {
+			loadUserInfo()
+		}, 500)
 	}
+}
+
+onMounted(() => {
+	loadUserInfo()
 	config.comments = comments
-}, 500)
+	console.log(config)
+})
 
 // 评论提交事件
 let temp_id = 100
 // 提交评论事件
-const submit = ({ content, parentId, finish }) => {
+const submit = ({content, parentId, finish}) => {
 	let str = '提交评论:' + content + ';\t父id: ' + parentId
 	console.log(str)
-
 	// 模拟请求接口生成数据
 	const comment = {
 		id: String((temp_id += 1)),
@@ -122,7 +151,7 @@ const submit = ({ content, parentId, finish }) => {
 	}
 	setTimeout(() => {
 		finish(comment)
-		UToast({ message: '评论成功!', type: 'info' })
+		UToast({message: '评论成功!', type: 'info'})
 	}, 200)
 }
 </script>

@@ -169,6 +169,17 @@ const routes = [
         ]
     },
     {
+        path: '/article',
+        name: 'article',
+        component: () => import('@/pages/Test/TestArticleList.vue'),
+    },
+    {
+        path:  '/article/detail/:id',
+        name: 'articleDetail',
+        props: true,
+        component: () => import('@/pages/Test/TestArticleDetail.vue'),
+    },
+    {
         path: '/c',
         name: 'collection',
         beforeEnter: (to, from, next) => {
