@@ -57,6 +57,35 @@
 				<el-tag v-for="item in tags" size="large" type="info" >{{item}}</el-tag>
 			</div>
 		</div>
+
+		<!-- 更新记录区域 -->
+		<div class="update-history">
+			<h3>更新记录</h3>
+			<div class="update-list">
+				<!-- 创建记录 -->
+				<div class="update-item">
+					<div class="update-info">
+						<span class="update-date">{{ formatDate(box.create_date) }}</span>
+						<span class="update-author">admin</span>
+					</div>
+					<div class="update-content">
+						<span>创建</span>
+					</div>
+				</div>
+				<!-- 更新记录列表 -->
+				<div v-for="(record, index) in updateRecords" :key="index" class="update-item">
+					<div class="update-info">
+						<span class="update-date">{{ formatDate(record.updated_at) }}</span>
+						<span class="update-author">{{ record.updated_by || 'admin' }}</span>
+					</div>
+					<div class="update-content">
+
+						<span v-for="(detail, index) in record.update_details">{{translate(index)}}: {{detail}}</span>
+					</div>
+				</div>
+			</div>
+		</div>
+
 		<!--		评论区域-->
 		<div class="comments">
 			<Waline :serverURL="serverURL" :path="path" :reaction="[]"/>
@@ -67,7 +96,7 @@
 <script setup>
 import {computed, onMounted, ref} from 'vue';
 import DetailsTitle from "@/components/details/DetailsTitle.vue";
-import {baseUrl, imageUrl, localUrl} from "@/utils/methods.js";
+import {baseUrl, imageUrl, localUrl, formatDate} from "@/utils/methods.js";
 
 
 // Waline评论面板
@@ -88,6 +117,15 @@ const path = computed(() => useRoute().path);
 // const imageUrl = ref('https://lingma-vl.oss-rg-china-mainland.aliyuncs.com/cloud/CPlxwF91fytKRrml8tR004190ZvojZlzmU6U0P3s2ZM/0e408adf-4593-4195-ae29-6b4b97d7d150_1736484421300.png'); // 替换为实际的宣传图地址
 const box = ref({})
 const tags = ref([])
+const updateRecords = ref([])
+const translate = (word) =>{
+	switch (word) {
+		case 'added_tags':
+			return '添加标签';
+		default:
+			return word;
+	}
+}
 
 const getPreviewImages = (index) => {
 	let tempImgList = [...box.value.image_url];//所有图片地址
@@ -106,6 +144,20 @@ const props = defineProps({
 	}
 })
 
+// 获取更新记录
+const fetchUpdateRecords = async (id) => {
+	try {
+		const response = await requests.get(
+			`${localUrl}/tags/images/${id}/update-history`
+		)
+		if (response.status === 200 && response.data.update_history) {
+			updateRecords.value = response.data.update_history;
+			// console.log(updateRecords.value);
+		}
+	} catch (error) {
+		console.error('获取更新记录失败:', error)
+	}
+}
 
 onMounted(() => {
 	// console.log(props.id)
@@ -146,6 +198,8 @@ onMounted(() => {
 				tags.value = response.data.tags
 			}
 		})
+		// 获取更新记录
+		fetchUpdateRecords(props.id)
 	})
 })
 
@@ -208,6 +262,50 @@ onMounted(() => {
 		//background-color: rgba(255, 192, 203, 0.2);
 		background-color: rgba(240, 248, 255, 0.3);
 		border-radius: 10px;
+	}
+
+	.update-history {
+		margin-top: 20px;
+		padding: 12px 20px;
+		background-color: rgba(240, 248, 255, 0.3);
+		border-radius: 10px;
+		
+		h3 {
+			border-bottom: 1px solid #ccc;
+			padding-bottom: 5px;
+		}
+		
+		.update-list {
+			.update-item {
+				padding: 8px 0;
+				border-bottom: 1px dashed #eee;
+				
+				&:last-child {
+					border-bottom: none;
+				}
+				
+				.update-info {
+					display: flex;
+					justify-content: space-between;
+					margin-bottom: 4px;
+					
+					.update-date {
+						color: #888;
+						font-size: 14px;
+					}
+					
+					.update-author {
+						color: #666;
+						font-weight: 500;
+					}
+				}
+				
+				.update-content {
+					color: #333;
+					font-size: 14px;
+				}
+			}
+		}
 	}
 
 	.header {
@@ -338,41 +436,3 @@ onMounted(() => {
 	margin-right: -0.5em;
 }
 </style>
-
-<!--template 好像没用
-
-
-<template #toolbar ="{ actions, prev, next, reset, activeIndex }" >
-							<el-icon @click="prev">
-								<DArrowLeft/>
-							</el-icon>
-							<el-icon @click="next">
-								<DArrowRight/>
-							</el-icon>
-							<el-icon @click="actions('zoomOut')">
-								<ZoomOut/>
-							</el-icon>
-							<el-icon
-								@click="actions('zoomIn', { enableTransition: false, zoomRate: 2 })"
-							>
-								<ZoomIn/>
-							</el-icon>
-							<el-icon
-								@click="actions('clockwise', { rotateDeg: 180, enableTransition: false })">
-								<RefreshRight/>
-							</el-icon>
-							<el-icon @click="actions('anticlockwise')">
-								<RefreshLeft/>
-							</el-icon>
-							<el-icon @click="reset">
-								<Refresh/>
-							</el-icon>
-							<el-icon @click="download(activeIndex)">
-								<Download/>
-							</el-icon>
-						</template>
-
-
-
-
--->
