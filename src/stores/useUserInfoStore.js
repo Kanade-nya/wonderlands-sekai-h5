@@ -74,6 +74,9 @@ export const useUserInfoStore = defineStore('userInfo', {
         // 添加一个方法来触发重新验证
         triggerRevalidation() {
             this.userInfo.loadingSuccess = false;
+        },
+        unLoginLoadingSuccess(){
+            this.userInfo.loadingSuccess = true;
         }
     }
 })

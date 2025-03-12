@@ -7,14 +7,14 @@
 						<h3 class="article-title">{{ article.title }}</h3>
 						<div class="article-meta">
 							<div class="author-info">
-								<img :src="article.authorAvatar" class="author-avatar" alt="author avatar">
+								<img :src="article.author_avatar || defau" class="author-avatar" alt="author avatar">
 								<span class="author">{{ article.author_name }}</span>
 							</div>
 							<div class="article-stats">
 								<span class="stat-item">{{ article.create_date }}</span>
 							</div>
 						</div>
-						<p class="article-summary">{{ article.content }}</p>
+						<p class="article-summary">{{ article.content_preview }}</p>
 					</div>
 				</div>
 			</div>
@@ -27,8 +27,8 @@ import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import Mock from 'mockjs';
 import axios from "axios";
-import {localUrl} from "@/utils/methods.js";
-
+import { localUrl } from "@/utils/methods.js";
+import { defaultAvatar } from "@/utils/user.js"
 const router = useRouter();
 
 // Setup mock data
@@ -36,12 +36,12 @@ const setupMockData = () => {
 	Mock.mock('/api/articles', 'get', {
 		'articles|8': [{
 			'id|+1': 1,
-			'title': function() {
+			'title': function () {
 				const prefixes = ['【gal随笔', '【池赞向】', '【掌机咸鱼の日志', '恋爱喜剧的转型', '与鲨鱼共度的七日间'];
 				return `${prefixes[this.id % 5]}${this.id}】 ${Mock.Random.ctitle(5, 15)}`;
 			},
 			'author': '@cname',
-			'authorAvatar': function() {
+			'authorAvatar': function () {
 				return `https://picsum.photos/id/${this.id + 20}/100/100`;
 			},
 			'articleCount': '@integer(5, 50)',
@@ -59,7 +59,7 @@ const fetchArticles = async () => {
 	setupMockData();
 	try {
 		const response = await axios.get(localUrl + '/articles/articles');
-		console.log('response: ',response)
+		console.log('response: ', response)
 		articles.value = response.data.map(article => {
 			// Generate random images only for some articles
 			if (article.image > 3) {
@@ -91,26 +91,29 @@ onMounted(() => {
 	min-height: calc(100vh - 98px);
 	max-width: 1200px;
 	margin: 0 auto;
-	padding: 16px;
+	padding: 24px;
 	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 
 	.article-grid {
-		display: grid;
-		grid-template-columns: repeat(2, 1fr);
-		gap: 20px;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 10px;
+		margin-bottom: 30px;
 	}
 
 	.article-item {
-		padding: 20px;
+		width: calc(50% - 5px); // 减去间距的一半
+		padding: 24px;
 		border-radius: 12px;
 		background-color: white;
 		box-shadow: 0 4px 1px rgba(0, 0, 0, 0.03), 0 1px 3px rgba(0, 0, 0, 0.05);
 		cursor: pointer;
 		transition: all 0.3s ease;
 		border: 1px solid rgba(0, 0, 0, 0.03);
-		height: 100%;
 		display: flex;
 		flex-direction: column;
+		min-height: 200px;
+		box-sizing: border-box;
 
 		&:hover {
 			transform: translateY(-4px);
@@ -130,17 +133,17 @@ onMounted(() => {
 				flex-direction: column;
 
 				.article-title {
-					margin: 0 0 16px 0;
+					margin: 0 0 20px 0;
 					font-size: 18px;
 					font-weight: 600;
-					line-height: 1.4;
+					line-height: 1.5;
 					color: #2c3e50;
 					transition: color 0.2s;
 					display: -webkit-box;
 					-webkit-line-clamp: 2;
 					-webkit-box-orient: vertical;
 					overflow: hidden;
-					
+
 					&:hover {
 						color: #3498db;
 					}
@@ -150,7 +153,7 @@ onMounted(() => {
 					display: flex;
 					justify-content: space-between;
 					align-items: center;
-					margin-bottom: 12px;
+					margin-bottom: 16px;
 
 					.author-info {
 						display: flex;
@@ -190,7 +193,7 @@ onMounted(() => {
 				.article-summary {
 					margin: 0;
 					font-size: 14px;
-					line-height: 1.6;
+					line-height: 1.8;
 					color: #5e6d82;
 					display: -webkit-box;
 					-webkit-line-clamp: 3;
@@ -206,44 +209,48 @@ onMounted(() => {
 
 @media screen and (max-width: 992px) {
 	.article-list-container {
-		.article-grid {
-			grid-template-columns: 1fr;
+		.article-item {
+			width: 100%;
 		}
 	}
 }
 
 @media screen and (max-width: 768px) {
 	.article-list-container {
-		padding: 12px;
-		
+		padding: 16px;
+
+		.article-grid {
+			gap: 20px;
+		}
+
 		.article-item {
 			padding: 16px;
-			
+
 			.article-content {
 				.article-info {
 					.article-title {
 						font-size: 16px;
 						margin-bottom: 10px;
 					}
-					
+
 					.article-meta {
 						flex-direction: column;
 						align-items: flex-start;
 						gap: 6px;
 						margin-bottom: 10px;
-						
+
 						.author-info {
 							.author-avatar {
 								width: 24px;
 								height: 24px;
 							}
-							
+
 							.author {
 								font-size: 13px;
 							}
 						}
 					}
-					
+
 					.article-summary {
 						font-size: 13px;
 						-webkit-line-clamp: 2;

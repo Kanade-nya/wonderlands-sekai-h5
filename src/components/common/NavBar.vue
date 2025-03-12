@@ -14,6 +14,7 @@ import SearchInput from "@/components/common/SearchInput.vue";
 import PhonePanel from "@/components/common/PhonePanel.vue";
 import {useUserInfoStore} from "@/stores/useUserInfoStore.js";
 import UserMenuPanel from "@/components/common/UserMenuPanel.vue";
+
 const userInfoStore = useUserInfoStore();
 
 const router = useRouter();

@@ -26,6 +26,7 @@ const validateUserToken = async () => {
 	const token = localStorage.getItem('access_token')
 	if (!token) {
 		console.log('没有token，去登录')
+		useUserInfo.unLoginLoadingSuccess()
 		return false
 	}
 
