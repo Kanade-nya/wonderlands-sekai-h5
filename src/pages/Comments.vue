@@ -17,14 +17,17 @@ const path = computed(() => useRoute().path);
 		<br>
 		<el-text class="comments-text"> 欢迎 游戏/角色相关，以及对于我们的网站建设的意见反馈</el-text>
 		<div style="margin-bottom: 20px;"></div>
+
+		<Waline :serverURL="serverURL" :path="path" :reaction="[]"/>
 	</div>
 
-	<Waline :serverURL="serverURL" :path="path" :reaction="[]"/>
+	
 </template>
 
 <style scoped lang="scss">
 .comments{
 	margin: 0 8px;
+	min-height: (calc(100vh - 80px - 58px))
 }
 .comments-text{
 	font-size: 1rem;

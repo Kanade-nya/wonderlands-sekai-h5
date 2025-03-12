@@ -6,30 +6,23 @@
 				<span><img src="@/public/images/icon.svg" alt="系统图标"></span>
 				<div>登录</div>
 
-
 			</div>
 			<el-form :model="loginForm" :rules="loginRules" ref="loginFormRef" class="login-form">
 				<el-form-item prop="username">
 					<el-input v-model="loginForm.username" placeholder="用户名" class="custom-font">
 						<template #prefix>
 							<el-icon>
-								<User/>
+								<User />
 							</el-icon>
 						</template>
 					</el-input>
 				</el-form-item>
 				<el-form-item prop="password">
-					<el-input
-						v-model="loginForm.password"
-						type="password"
-						placeholder="密码"
-						show-password
-						@keyup.enter="handleLogin"
-						class="custom-font"
-					>
+					<el-input v-model="loginForm.password" type="password" placeholder="密码" show-password
+						@keyup.enter="handleLogin" class="custom-font">
 						<template #prefix>
 							<el-icon>
-								<Lock/>
+								<Lock />
 							</el-icon>
 						</template>
 					</el-input>
@@ -59,12 +52,14 @@
 </template>
 
 <script setup>
-import {ref, reactive, onMounted} from 'vue'
-import {User, Lock} from '@element-plus/icons-vue'
-import {ElMessage} from 'element-plus'
-import {useRouter} from "vue-router";
+import { ref, reactive, onMounted } from 'vue'
+import { User, Lock } from '@element-plus/icons-vue'
+import { ElMessage } from 'element-plus'
+import { useRouter } from "vue-router";
 import axios from "axios";
-
+import { useUserInfoStore } from "@/stores/useUserInfoStore.js";
+import { localUrl } from "@/utils/methods.js";
+import {validateUserToken} from '@/utils/user.js'
 const router = useRouter()
 
 const handleForget = () => {
@@ -92,12 +87,12 @@ const loginForm = reactive({
 // 表单验证规则
 const loginRules = {
 	username: [
-		{required: true, message: '请输入用户名', trigger: 'blur'},
-		{min: 3, max: 20, message: '长度在 3 到 20 个字符', trigger: 'blur'}
+		{ required: true, message: '请输入用户名', trigger: 'blur' },
+		{ min: 3, max: 20, message: '长度在 3 到 20 个字符', trigger: 'blur' }
 	],
 	password: [
-		{required: true, message: '请输入密码', trigger: 'blur'},
-		{min: 8, max: 20, message: '长度在 8 到 20 个字符', trigger: 'blur'}
+		{ required: true, message: '请输入密码', trigger: 'blur' },
+		{ min: 8, max: 20, message: '长度在 8 到 20 个字符', trigger: 'blur' }
 	]
 }
 
@@ -105,7 +100,7 @@ const loginFormRef = ref(null)
 const loading = ref(false)
 
 // 登录处理
-const handleLogin = () => {
+const handleLogin = async () => {
 	if (!loginFormRef.value) return
 
 	loginFormRef.value.validate(async (valid) => {
@@ -121,7 +116,7 @@ const handleLogin = () => {
 			}
 			// 调用API
 			const response = await axios.post(
-				'http://127.0.0.1:8000/login',
+				`${localUrl}/login`,
 				formData,
 				{
 					headers: {
@@ -135,8 +130,16 @@ const handleLogin = () => {
 				// 存储token
 				localStorage.setItem('access_token', response.data.access_token)
 
+				// 导入并使用 userInfoStore
+				const userInfoStore = useUserInfoStore();
+				// 触发重新验证
+				userInfoStore.triggerRevalidation();
+
+				await validateUserToken()
+
 				// 这里可以添加路由跳转
-				router.push('/')
+				// router.push('/')
+				router.replace('/')
 				console.log('登录成功')
 			} else {
 				ElMessage.error(response.message || '登录失败')
@@ -160,8 +163,8 @@ onMounted(() => {
 	const token = localStorage.getItem('access_token')
 	if (!token) {
 		console.log('没有token')
-	}else{
-		axios.get('http://127.0.0.1:8000/protected', {
+	} else {
+		axios.get(`${localUrl}/protected`, {
 			headers: {
 				Authorization: `Bearer ${token}`
 			}
@@ -226,10 +229,12 @@ onMounted(() => {
 				display: flex;
 				justify-content: space-between;
 				width: 100%;
-				.forget-link{
+
+				.forget-link {
 					margin-left: 4px;
 				}
-				.register{
+
+				.register {
 					display: flex;
 					justify-content: center;
 

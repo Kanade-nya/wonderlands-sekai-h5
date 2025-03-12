@@ -1,6 +1,6 @@
 <!-- src/components/Banner.vue -->
 <script setup>
-import {ref, defineProps,onUnmounted} from 'vue';
+import {ref, defineProps,onUnmounted,computed} from 'vue';
 import {ArrowDown, Back, Operation, UserFilled} from "@element-plus/icons-vue";
 // import GridRow from "@/components/grid/GridRow.vue";
 import VerticalMenu from "@/components/grid/VerticalMenu.vue";
@@ -95,6 +95,10 @@ const jump2Collection = () => {
 	router.push('/c/box')
 }
 
+
+const jump2Article = () => {
+	router.push('/co/articles')
+}
 const isPanelVisible = ref(false);
 
 const onMenuClick = () => {
@@ -187,6 +191,16 @@ const onAvatarClick = () => {
 onUnmounted(() => {
 	clearTimeout(hoverTimer);
 });
+
+// 默认头像地址
+const defaultAvatar = 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png';
+// 使用计算属性获取用户头像，如果未登录或没有头像则使用默认头像
+const userAvatar = computed(() => {
+  return userInfoStore.getUserInfo.userAvatar || defaultAvatar;
+});
+
+
+
 </script>
 
 <template>
@@ -216,6 +230,14 @@ onUnmounted(() => {
 			<el-link :underline="false" @click="jump2Collection">
 				<div class="grid-item" :class="{is_selected: is_selected === 6}" @click="handleClick('合集',6)">
 					<span>合集</span>
+				</div>
+			</el-link>
+
+
+			<!-- 添加文章导航项 -->
+			<el-link :underline="false" @click="jump2Article">
+				<div class="grid-item" :class="{is_selected: is_selected === 7}" @click="handleClick('文章',7)">
+					<span>文章</span>
 				</div>
 			</el-link>
 
@@ -289,7 +311,7 @@ onUnmounted(() => {
 				@mouseenter="showUserMenu"
 				@mouseleave="hideUserMenu"
 			>
-				<el-avatar :size="30" :src="userInfoStore.getUserInfo.userAvatar" @click="onAvatarClick"></el-avatar>
+				<el-avatar :size="30" :src="userAvatar" @click="onAvatarClick"></el-avatar>
 				<transition
 					name="fade"
 					class="user-panel"

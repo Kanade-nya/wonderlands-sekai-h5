@@ -9,7 +9,6 @@
 					<el-input v-model="profile.nickname" placeholder="取一个好听的名字" class="form-input" />
 				</div>
 
-<!--				&lt;!&ndash; Gender &ndash;&gt;-->
 <!--				<div class="form-item">-->
 <!--					<div class="label">性别</div>-->
 <!--					<div class="gender-options">-->
@@ -39,7 +38,7 @@
 
 				<!-- Save button -->
 				<div class="save-container">
-					<el-button type="primary" class="save-button">保存资料</el-button>
+					<el-button type="primary" class="save-button" @click="saveProfile" :loading="loading" >保存资料</el-button>
 				</div>
 			</div>
 
@@ -56,8 +55,13 @@
 import { ref ,onMounted} from 'vue';
 import {ArrowLeft} from "@element-plus/icons-vue";
 import {useUserInfoStore} from "@/stores/useUserInfoStore.js";
+import { ElMessage } from 'element-plus';
+import requests from "@/utils/requests.js";
+import { localUrl } from "@/utils/methods.js";
 
 const userInfoStore = useUserInfoStore();
+const loading = ref(false);
+
 
 const profile = ref({
 	nickname: 'miiro',
@@ -65,12 +69,48 @@ const profile = ref({
 	website: '',
 	introduction: ''
 });
+
 onMounted(()=>{
 	profile.value.nickname = userInfoStore.getUserInfo.userName;
 	profile.value.website = userInfoStore.getUserInfo.userBlog;
-	profile.value.introduction = userInfoStore.getUserInfo.description;
+	profile.value.introduction = userInfoStore.getUserInfo.userDescription;
+	console.log(profile.value)
 })
 
+// 保存用户资料
+const saveProfile = async () => {
+	try {
+		loading.value = true;
+		const response = await requests.post(
+			`${localUrl}/user/update-profile`,
+			{
+				description: profile.value.introduction,
+				blog: profile.value.website
+			},
+			{
+				headers: {
+					'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+				}
+			}
+		);
+		
+		if (response.status === 200) {
+			ElMessage.success('资料更新成功');
+			// 更新本地存储的用户信息
+			userInfoStore.updateUserInfo({
+				userBlog: profile.value.website,
+				userDescription: profile.value.introduction
+			});
+		} else {
+			ElMessage.error('资料更新失败');
+		}
+	} catch (error) {
+		console.error('更新资料出错:', error);
+		ElMessage.error('更新资料时发生错误');
+	} finally {
+		loading.value = false;
+	}
+};
 
 </script>
 

@@ -3,6 +3,7 @@ import About from "@/pages/About.vue";
 import Home from "@/pages/Home.vue";
 import Pages from "@/pages/Pages.vue";
 import Comments from "@/pages/Comments.vue";
+// import { validateUserToken } from '@/utils/user';
 
 const routes = [
     {
@@ -18,8 +19,11 @@ const routes = [
         path: '/',
         name: 'home',
         component: () => import('@/pages/Home.vue'),
-        beforeEnter: (to, from, next) => {
+        beforeEnter: async (to, from, next) => {
             document.title = 'Wonderlands×Sekai⭐Gallery Wonderhoy——'
+            // if(localStorage.getItem('access_token')){
+            //     await validateUserToken()
+            // }
             next()
         },
     },
@@ -165,12 +169,21 @@ const routes = [
                 path: 'profile',
                 name: 'userProfile',
                 component: () => import('@/pages/User/Profile/UserProfileContainer.vue'),
-            }
+            },
+            {
+                path: 'post-record',
+                name: 'userPostRecord',
+                component: () => import('@/pages/User/PostRecord.vue'),
+                beforeEnter: (to, from, next) => {
+                    document.title = '发表记录';
+                    next();
+                },
+            },
         ]
     },
     {
-        path: '/article',
-        name: 'article',
+        path: '/co/articles',
+        name: 'articles',
         component: () => import('@/pages/Test/TestArticleList.vue'),
     },
     {
