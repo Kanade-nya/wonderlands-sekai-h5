@@ -73,9 +73,9 @@ const jump = () => {
 
 	</div>
 
-	<h3>更新记录</h3>
+	<!-- <h3>更新记录</h3>
 	<el-text>25/02/12 更换cos对象存储为cloudflare R2</el-text>
-	<el-text>25/02/09 更新新筛选器，去掉原有分类</el-text>
+	<el-text>25/02/09 更新新筛选器，去掉原有分类</el-text> -->
 	
 </template>
 

@@ -40,36 +40,36 @@
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { User, Lock } from '@element-plus/icons-vue'
-import Mock from 'mockjs'
+// import Mock from 'mockjs'
 
 // 加载状态
 const loading = ref(false)
 
 // 设置Mock数据
 onMounted(() => {
-	Mock.mock('/api/login', 'post', (options) => {
-		const { username, password } = JSON.parse(options.body)
+	// Mock.mock('/api/login', 'post', (options) => {
+	// 	const { username, password } = JSON.parse(options.body)
 
-		// 模拟成功登录
-		if (username && password) {
-			return {
-				code: 200,
-				message: '登录成功',
-				data: {
-					userId: Mock.Random.id(),
-					username,
-					token: Mock.Random.guid(),
-					avatar: Mock.Random.image('100x100', '#50B347', '#FFF', 'Avatar')
-				}
-			}
-		} else {
-			return {
-				code: 401,
-				message: '用户名或密码错误',
-				data: null
-			}
-		}
-	})
+	// 	// 模拟成功登录
+	// 	if (username && password) {
+	// 		return {
+	// 			code: 200,
+	// 			message: '登录成功',
+	// 			data: {
+	// 				userId: Mock.Random.id(),
+	// 				username,
+	// 				token: Mock.Random.guid(),
+	// 				avatar: Mock.Random.image('100x100', '#50B347', '#FFF', 'Avatar')
+	// 			}
+	// 		}
+	// 	} else {
+	// 		return {
+	// 			code: 401,
+	// 			message: '用户名或密码错误',
+	// 			data: null
+	// 		}
+	// 	}
+	// })
 })
 
 // 表单引用

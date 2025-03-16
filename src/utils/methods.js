@@ -2,8 +2,8 @@
 export const baseUrl = 'https://wonderlands-sekai.space'
 export const imageUrl = 'https://img.wonderlands-sekai.space'
 // export  const baseUrl = 'http://192.168.3.194:5000'
-export const localUrl = 'http://127.0.0.1:8000'
-// export const localUrl = 'https://wonderlands-sekai.space/api3'
+// export const localUrl = 'http://127.0.0.1:8000'
+export const localUrl = 'https://wonderlands-sekai.space/api3'
 export const ACCOUNT_ID = '7a0c96ad44cdb5138ab8b11a11658303'
 export const treeToList = (tree) => {
     let list = []
@@ -36,6 +36,36 @@ export const formatDate = (dateString) => {
     const day = date.getDate()
     return `${year}-${month}-${day}`
 }
+
+export const formatDate2 = (dateString) => {
+    if (!dateString) return '';
+    
+    const date = new Date(dateString);
+    const now = new Date();
+    const diff = now - date;
+    
+    // 转换为秒、分钟、小时、天数
+    const seconds = Math.floor(diff / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(minutes / 60);
+    const days = Math.floor(hours / 24);
+    const months = Math.floor(days / 30);
+    const years = Math.floor(days / 365);
+    
+    if (seconds < 60) {
+      return '刚刚';
+    } else if (minutes < 60) {
+      return `${minutes}分钟前`;
+    } else if (hours < 24) {
+      return `${hours}小时前`;
+    } else if (days < 30) {
+      return `${days}天前`;
+    } else if (months < 12) {
+      return `${months}个月前`;
+    } else {
+      return `${years}年前`;
+    }
+  };
 
 export const parseImageUrl = (url) => {
     return JSON.parse(url.replace(/'/g, '"'))

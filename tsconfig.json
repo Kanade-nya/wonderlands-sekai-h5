@@ -2,24 +2,26 @@
   "files": [],
   "references": [
     {
-      "path": "./tsconfig.app.json"
+      "path": "./tsconfig.app.json",
+      "composite": true
     },
     {
-      "path": "./tsconfig.node.json"
+      "path": "./tsconfig.node.json",
+      "composite": true
     }
   ],
   "compilerOptions": {
     "baseUrl": "./",
-    "paths ": {
+    "paths": {
       "@/*": [
         "src/*"
       ]
     },
     "allowJs": true
   },
-  "include": [
-    "src/**/*.ts",
-    "src/**/*.tsx",
-    "src/**/*.vue"
-  ]
+//  "include": [
+//    "src/**/*.ts",
+//    "src/**/*.tsx",
+//    "src/**/*.vue"
+//  ]
 }

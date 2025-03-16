@@ -1,9 +1,7 @@
-import {createRouter, createWebHistory, createWebHashHistory} from 'vue-router'
-import About from "@/pages/About.vue";
-import Home from "@/pages/Home.vue";
-import Pages from "@/pages/Pages.vue";
-import Comments from "@/pages/Comments.vue";
+import { createRouter, createWebHistory, createWebHashHistory } from 'vue-router'
 // import { validateUserToken } from '@/utils/user';
+// ... 其他导入保持不变 ...
+import { ElLoading } from 'element-plus';
 
 const routes = [
     {
@@ -73,31 +71,6 @@ const routes = [
             }
         }
     },
-
-    // {
-    //     path: '/Post/information',
-    //     name: 'postInformation',
-    //     component: () => import('@/pages/Post/PostInformation.vue'),
-    //     beforeEnter: (to, from, next) => {
-    //         if (localStorage.getItem('token') === '9.09') {
-    //             next()
-    //         } else {
-    //             next('/token')
-    //         }
-    //     }
-    // },
-    // {
-    //     path: '/Post/editor',
-    //     name: 'postEditor',
-    //     component: () => import('@/pages/Post/PostEditorMain.vue'),
-    //     beforeEnter: (to, from, next) => {
-    //         if (localStorage.getItem('token') === '9.09') {
-    //             next()
-    //         } else {
-    //             next('/token')
-    //         }
-    //     }
-    // },
     {
         path: '/Post',
         name: 'post',
@@ -173,7 +146,15 @@ const routes = [
             {
                 path: 'post-record',
                 name: 'userPostRecord',
-                component: () => import('@/pages/User/PostRecord.vue'),
+                component: () => {
+                    const loading = ElLoading.service({
+                        text: '加载中...',
+                        background: 'rgba(255, 255, 255, 0.7)'
+                    });
+                    return import('@/pages/User/Post/UserPostRecord.vue').finally(() => {
+                        loading.close();
+                    });
+                },
                 beforeEnter: (to, from, next) => {
                     document.title = '发表记录';
                     next();
@@ -181,16 +162,35 @@ const routes = [
             },
         ]
     },
+    // 将文章相关路由合并为子路由
     {
-        path: '/co/articles',
-        name: 'articles',
-        component: () => import('@/pages/Test/TestArticleList.vue'),
-    },
-    {
-        path:  '/co/articles/detail/:id',
-        name: 'articleDetail',
-        props: true,
-        component: () => import('@/pages/Test/TestArticleDetail.vue'),
+        path: '/co',
+        name: 'content',
+        beforeEnter: (to, from, next) => {
+            document.title = 'Wonderlands×Sekai⭐Articles!'
+            next()
+        },
+        children: [
+            {
+                path: 'articles',
+                name: 'articles',
+                component: () => import('@/pages/Test/TestArticleList.vue'),
+            },
+            {
+                path: 'articles/detail/:id',
+                name: 'articleDetail',
+                props: true,
+                component: () => {
+                    const loading = ElLoading.service({
+                        text: '加载文章详情中...',
+                        background: 'rgba(255, 255, 255, 0.7)'
+                    });
+                    return import('@/pages/Test/TestArticleDetail.vue').finally(() => {
+                        loading.close();
+                    });
+                },
+            }
+        ]
     },
     {
         path: '/c',

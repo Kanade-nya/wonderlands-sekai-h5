@@ -31,7 +31,7 @@ const validateUserToken = async () => {
 	}
 
 	try {
-		const response = await axios.get(`${localUrl}/protected`, {
+		const response = await axios.get(`${localUrl}/user/protected`, {
 			headers: {
 				Authorization: `Bearer ${token}`
 			}

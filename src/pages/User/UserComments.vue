@@ -3,8 +3,13 @@
 		<!-- 启用信息卡槽来自定义用户名和标签 -->
 		<template #info="{ user }">
 			<div class="user-info-custom">
-				<!-- <span class="username">{{ user.username }}</span> -->
-				<span class="user-tag">1</span>
+				<div class="tags-container">
+					
+					<span v-for="tag in user.tags" :key="tag.content" class="user-tag"
+						:style="{ borderColor: tag.color, color: tag.color }">
+						{{ tag.content }}
+					</span>
+				</div>
 			</div>
 		</template>
 		<!-- <template>导航栏卡槽</template>
@@ -25,7 +30,7 @@ import axios from "axios";
 import { localUrl } from "@/utils/methods.js";
 import { useRoute } from 'vue-router';
 import COS from 'cos-js-sdk-v5';
-import {apiConfig} from "@/config/Config.js";
+import { apiConfig } from "@/config/Config.js";
 import { fi } from 'element-plus/es/locale/index.mjs';
 
 const route = useRoute();
@@ -54,21 +59,21 @@ const config = reactive({
 		if (files.length > 3) {
 			UToast({ message: '最多只能上传三张图片', type: 'error' });
 		}
-		
+
 		// 清空之前的上传记录
 		upload_images_location.length = 0;
 		// 创建上传任务数组
 		const uploadTasks = [];
-		
+
 		for (let file of files) {
 			// 上传图片到COS
 			console.log(file);
-			
+
 			const cos = new COS({
 				SecretId: apiConfig.getCosConfig().SecretId, // 替换为你的 SecretId
 				SecretKey: apiConfig.getCosConfig().SecretKey, // 替换为你的 SecretKey
 			});
-			
+
 			const bucketName = 'user-1304757492'; // 替换为你的存储桶名称
 			const region = 'ap-guangzhou'; // 替换为你的存储桶区域
 			const key = `images/${Date.now()}_${file.name}`; // 生成唯一的文件路径
@@ -106,7 +111,7 @@ const config = reactive({
 		} catch (error) {
 			console.error('图片上传过程中出错:', error);
 			UToast({ message: '部分图片上传失败', type: 'error' });
-			
+
 			// 即使有错误，也返回已成功上传的图片
 			if (upload_images_location.length > 0) {
 				finish(upload_images_location);
@@ -179,6 +184,20 @@ const commentsSample = [
 ]
 
 
+// 添加获取用户标签的函数
+const fetchUsersTags = async (userIds) => {
+	try {
+		const response = await axios.post(`${localUrl}/user/get-users-meta-info`, {
+			user_ids: userIds
+		});
+		return response.data.users;
+	} catch (error) {
+		console.error('获取用户标签失败:', error);
+		return [];
+	}
+};
+
+
 // 获取文章评论
 const fetchComments = async () => {
 	try {
@@ -186,7 +205,55 @@ const fetchComments = async () => {
 
 		const response = await axios.get(`${localUrl}/articles/articles/${articleId.value}/comments`);
 		if (response.data && Array.isArray(response.data)) {
-			config.comments = response.data;
+
+			// 收集所有用户ID
+			const userIds = new Set();
+			response.data.forEach(comment => {
+				userIds.add(comment.uid);
+				// 如果有回复，也添加回复中的用户ID
+				if (comment.reply && Array.isArray(comment.reply.list)) {
+					comment.reply.list.forEach(reply => {
+						userIds.add(reply.uid);
+					});
+				}
+			});
+
+			// 获取所有用户的标签
+			const usersWithTags = await fetchUsersTags(Array.from(userIds));
+
+			// 创建用户标签映射
+			const userTagsMap = {};
+			usersWithTags.forEach(user => {
+				userTagsMap[user.id] = user.meta || [];
+			});
+
+			// 更新评论数据，添加用户标签
+			const commentsWithTags = response.data.map(comment => {
+				const commentWithTags = {
+					...comment,
+					user: {
+						...comment.user,
+						tags: userTagsMap[comment.uid] || []
+					}
+				};
+
+				// 如果有回复，也更新回复中的用户标签
+				if (comment.reply && Array.isArray(comment.reply.list)) {
+					commentWithTags.reply.list = comment.reply.list.map(reply => ({
+						...reply,
+						user: {
+							...reply.user,
+							tags: userTagsMap[reply.uid] || []
+						}
+					}));
+				}
+
+				return commentWithTags;
+			});
+
+
+
+			config.comments = commentsWithTags;
 			temp_id.value = response.data.length;
 		}
 	} catch (error) {
@@ -296,24 +363,51 @@ const submit = ({ content, parentId, finish }) => {
 </script>
 
 <style lang="scss" scoped>
+:deep(.user-info  .username .name ){
+	position: relative;
+    display: inline-block;
+    margin-inline-end: .5em;
+    font-weight: bold;
+    font-size: .875em;
+    line-height: 15px !important;
+    text-decoration: none;
+}
 .user-info-custom {
 	display: flex;
 	align-items: center;
-	gap: 6px;
+	gap: 10px;
+	flex-wrap: wrap;
 
 	.username {
 		font-weight: 500;
+		font-size: 14px;
+		color: #333;
+	}
+	
+	.tags-container {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		flex-wrap: wrap;
 	}
 
 	.user-tag {
-		background-color: #f0f2f5;
-		color: #666;
 		font-size: 12px;
-		padding: 1px 6px;
+		padding: 1px 8px;
 		border-radius: 4px;
+		border: 1px solid;
+		background-color: transparent;
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
+		transition: all 0.3s ease;
+		line-height: 1.5;
+
+		&:hover {
+			background-color: rgba(0, 0, 0, 0.05);
+			transform: translateY(-1px);
+			cursor: pointer;
+		}
 	}
 }
 </style>

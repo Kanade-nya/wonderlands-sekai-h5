@@ -1,3 +1,4 @@
+<!--旧的 PostRecord 组件，把投稿，历史拆分-->
 <template>
 	<div class="publication-container">
 		<el-card class="publication-card">
@@ -16,16 +17,27 @@
 							</el-form-item>
 
 							<el-form-item label="主题" prop="topic">
-<!--								<el-select v-model="publicationForm.topic" placeholder="请选择文章主题" class="topic-select">-->
-<!--									<el-option v-for="item in topicOptions" :key="item.value" :label="item.label" :value="item.value"></el-option>-->
-<!--								</el-select>-->
+								<!--								<el-select v-model="publicationForm.topic" placeholder="请选择文章主题" class="topic-select">-->
+								<!--									<el-option v-for="item in topicOptions" :key="item.value" :label="item.label" :value="item.value"></el-option>-->
+								<!--								</el-select>-->
 								<el-input v-model="publicationForm.topic" placeholder="文章的主题是？"></el-input>
 							</el-form-item>
 
 							<el-form-item label="内容" prop="content">
-								<div class="markdown-container">
-									<v-md-editor v-model="publicationForm.content" class="markdown-editor"></v-md-editor>
+								<!-- <div class="markdown-container">
+									<v-md-editor v-model="publicationForm.content"
+										class="markdown-editor"></v-md-editor>
 
+
+								</div> -->
+								<div class="markdown-container">
+									<div style="border: 1px solid #ccc">
+										<Toolbar style="border-bottom: 1px solid #ccc" :editor="editorRef"
+										         :defaultConfig="toolbarConfig" :mode="mode" />
+										<Editor style="height: 500px; overflow-y: hidden;"
+										        v-model="publicationForm.content" :defaultConfig="editorConfig" :mode="mode"
+										        @onCreated="handleCreated" />
+									</div>
 								</div>
 							</el-form-item>
 
@@ -53,12 +65,8 @@
 							<el-table-column label="操作" width="150">
 								<template #default="scope">
 									<el-button size="small" @click="viewPublication(scope.row)">查看</el-button>
-									<el-button
-										size="small"
-										type="primary"
-										@click="editPublication(scope.row)"
-										v-if="scope.row.status === '草稿' || scope.row.status === '退回修改'"
-									>
+									<el-button size="small" type="primary" @click="editPublication(scope.row)"
+									           v-if="scope.row.status === '草稿' || scope.row.status === '退回修改'">
 										编辑
 									</el-button>
 								</template>
@@ -66,14 +74,10 @@
 						</el-table>
 
 						<div class="pagination-container">
-							<el-pagination
-								@size-change="handleSizeChange"
-								@current-change="handleCurrentChange"
-								:current-page="pagination.currentPage"
-								:page-sizes="[10, 20, 30, 50]"
-								:page-size="pagination.pageSize"
-								layout="total, sizes, prev, pager, next, jumper"
-								:total="pagination.total">
+							<el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange"
+							               :current-page="pagination.currentPage" :page-sizes="[10, 20, 30, 50]"
+							               :page-size="pagination.pageSize" layout="total, sizes, prev, pager, next, jumper"
+							               :total="pagination.total">
 							</el-pagination>
 						</div>
 					</div>
@@ -89,8 +93,9 @@
 					<span>主题: {{ currentPublication.topicLabel }}</span>
 					<span>发表时间: {{ currentPublication.createTime }}</span>
 					<span>状态:
-            <el-tag :type="getStatusType(currentPublication.status)">{{ currentPublication.status }}</el-tag>
-          </span>
+						<el-tag :type="getStatusType(currentPublication.status)">{{ currentPublication.status
+							}}</el-tag>
+					</span>
 				</div>
 				<div class="publication-content">
 					<v-md-preview :text="currentPublication.content"></v-md-preview>
@@ -103,6 +108,7 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue';
 import { ElMessage } from 'element-plus';
+import COS from 'cos-js-sdk-v5';
 // import VmdEditor from '@kangc/v-md-editor';
 
 import '@kangc/v-md-editor/lib/style/base-editor.css';
@@ -115,42 +121,98 @@ import createLineNumbertPlugin from '@kangc/v-md-editor/lib/plugins/line-number/
 import createCopyCodePlugin from '@kangc/v-md-editor/lib/plugins/copy-code/index';
 import '@kangc/v-md-editor/lib/plugins/copy-code/copy-code.css';
 
-
-// // 导入 Vue Markdown 编辑器
-// import VueMarkdownEditor from '@kangc/v-md-editor';
-// import VueMarkd
-// // 导入编辑器的基础样式
-// import '@kangc/v-md-editor/lib/style/base-editor.css';
-//
-// // 导入 VuePress 主题的脚本和样式
-// import vuepressTheme from '@kangc/v-md-editor/lib/theme/vuepress.js';
-// import '@kangc/v-md-editor/lib/theme/style/vuepress.css';
-
-// 配置Markdown编辑器
-// VmdEditor.use(vuepressTheme, {
-// 	Prism
-// });
-// VmdPreview.use(vuepressTheme, {
-// 	Prism
-// });
 // 使用 VuePress 主题配置 Markdown 编辑器，包括 Prism 和代码高亮扩展映射
 import VMdEditor from '@kangc/v-md-editor';
 import VMdPreview from '@kangc/v-md-editor/lib/preview';
 import '@kangc/v-md-editor/lib/style/preview.css'
 import axios from "axios";
-import {localUrl} from "@/utils/methods.js";
-import {useUserInfoStore} from "@/stores/useUserInfoStore.js";
+import { localUrl } from "@/utils/methods.js";
+import { useUserInfoStore } from "@/stores/useUserInfoStore.js";
 const userInfoStore = useUserInfoStore();
-// VueMarkdownEditor.use(vuepressTheme, {
-// 	Prism,
-// 	codeHighlightExtensionMap: {
-// 		vue: 'html',
-// 	},
-// });
-//
-// // 使用行号插件和复制代码插件扩展 Markdown 编辑器功能
-// VueMarkdownEditor.use(createLineNumbertPlugin());
-// VueMarkdownEditor.use(createCopyCodePlugin());
+import {apiConfig} from "@/config/Config.js";
+
+// 局部引入
+import { QuillEditor } from '@vueup/vue-quill'
+import '@vueup/vue-quill/dist/vue-quill.snow.css'
+
+import '@wangeditor/editor/dist/css/style.css' // 引入 css
+
+import { onBeforeUnmount, shallowRef } from 'vue'
+import { Editor, Toolbar } from '@wangeditor/editor-for-vue'
+
+const editorRef = shallowRef()
+
+// 内容 HTML
+const valueHtml = ref('<p>hello</p>')
+
+// 模拟 ajax 异步获取内容
+onMounted(() => {
+	setTimeout(() => {
+		valueHtml.value = '<p>模拟 Ajax 异步设置内容</p>'
+	}, 1500)
+})
+
+const toolbarConfig = {}
+const editorConfig = {
+	placeholder: '请输入内容...',
+	withCredentials: true,
+	MENU_CONF: {},
+}
+
+editorConfig.MENU_CONF['uploadImage'] = {
+	async customUpload(file, insertFn) {
+		const cos = new COS({
+			SecretId: apiConfig.getCosConfig().SecretId, // 替换为你的 SecretId
+			SecretKey: apiConfig.getCosConfig().SecretKey, // 替换为你的 SecretKey
+		});
+
+		const bucketName = 'user-1304757492'; // 替换为你的存储桶名称
+		const region = 'ap-guangzhou'; // 替换为你的存储桶区域
+		const key = `images/${Date.now()}_${file.name}`; // 生成唯一的文件路径
+
+		const uploadTask = new Promise((resolve, reject) => {
+			cos.putObject(
+				{
+					Bucket: bucketName,
+					Region: region,
+					Key: key,
+					Body: file,
+				},
+				(err, data) => {
+					if (err) {
+						ElMessage.info('上传失败');
+						// UToast({ message: '上传失败', type: 'error' });
+						reject(err);
+					} else {
+						ElMessage.info('上传成功');
+						insertFn(`https://${data.Location}`, '', '')
+						console.log(data.Location);
+						// upload_images_location.push(`https://${data.Location}`);
+						resolve(data.Location);
+					}
+				}
+			);
+		});
+		// TS 语法
+		// async customUpload(file, insertFn) {                   // JS 语法
+		// file 即选中的文件
+		// 自己实现上传，并得到图片 url alt href
+		// 最后插入图片
+
+	},
+}
+
+// 组件销毁时，也及时销毁编辑器
+onBeforeUnmount(() => {
+	const editor = editorRef.value
+	if (editor == null) return
+	editor.destroy()
+})
+
+const handleCreated = (editor) => {
+	editorRef.value = editor // 记录 editor 实例，重要！
+}
+
 VMdEditor.use(vuepressTheme, {
 	Prism,
 	codeHighlightExtensionMap: {
@@ -313,7 +375,6 @@ onMounted(() => {
 </script>
 
 <style lang="scss">
-
 .publication-container {
 	max-width: 1200px;
 	margin: 20px auto;
@@ -351,7 +412,8 @@ onMounted(() => {
 			border-radius: 4px;
 			width: 100%;
 			min-height: 400px;
-			.v-md-editor{
+
+			.v-md-editor {
 				min-height: 400px;
 				box-shadow: none;
 			}

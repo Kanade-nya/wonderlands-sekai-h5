@@ -5,39 +5,25 @@
 
 			<el-form :model="registerForm" :rules="rules" ref="registerFormRef">
 				<el-form-item prop="username">
-					<el-input
-						v-model="registerForm.username"
-						placeholder="用户名"
-						:prefix-icon="User">
+					<el-input v-model="registerForm.username" placeholder="用户名" :prefix-icon="User">
 					</el-input>
 				</el-form-item>
 
 				<el-form-item prop="password">
-					<el-input
-						v-model="registerForm.password"
-						type="password"
-						placeholder="密码"
-						:prefix-icon="Lock"
+					<el-input v-model="registerForm.password" type="password" placeholder="密码" :prefix-icon="Lock"
 						show-password>
 					</el-input>
 				</el-form-item>
 
 				<el-form-item prop="confirmPassword">
-					<el-input
-						v-model="registerForm.confirmPassword"
-						type="password"
-						placeholder="确认密码"
-						:prefix-icon="Lock"
-						show-password>
+					<el-input v-model="registerForm.confirmPassword" type="password" placeholder="确认密码"
+						:prefix-icon="Lock" show-password>
 					</el-input>
 				</el-form-item>
 
 				<el-form-item prop="email">
 					<div style="display: flex;justify-content: space-between;width: 100%;gap: 20px">
-						<el-input
-							v-model="registerForm.email"
-							placeholder="邮箱"
-							:prefix-icon="Message">
+						<el-input v-model="registerForm.email" placeholder="邮箱" :prefix-icon="Message">
 						</el-input>
 						<el-button :disabled="isSendingCode" @click="sendVerificationCode" class="custom-font">
 							{{ isSendingCode ? `${countdown}s` : '发送验证码' }}
@@ -47,10 +33,7 @@
 				</el-form-item>
 
 				<el-form-item prop="verificationCode">
-					<el-input
-						v-model="registerForm.verification_code"
-						placeholder="邮箱验证码"
-						:prefix-icon="Postcard">
+					<el-input v-model="registerForm.verification_code" placeholder="邮箱验证码" :prefix-icon="Postcard">
 					</el-input>
 				</el-form-item>
 
@@ -63,14 +46,27 @@
 </template>
 
 <script setup>
-import {ref, reactive, onMounted, onUnmounted} from 'vue'
-import {ElMessage} from 'element-plus'
-import {User, Lock, Message, Postcard} from "@element-plus/icons-vue";
+import { ref, reactive, onMounted, onUnmounted } from 'vue'
+import { ElMessage } from 'element-plus'
+import { User, Lock, Message, Postcard } from "@element-plus/icons-vue";
 
 import axios from "axios";
-import {useRouter} from "vue-router";
+import { useRouter } from "vue-router";
 
+import { localUrl } from "@/utils/methods.js";
 const router = useRouter()
+
+// 添加安全过滤函数
+const sanitizeInput = (input) => {
+	if (typeof input !== 'string') return input;
+	return input
+		.replace(/[<>]/g, '') // 移除 < > 标签
+		.replace(/['"]/g, '') // 移除引号
+		.replace(/[;()\\]/g, '') // 移除特殊字符
+		.replace(/javascript:/gi, '') // 移除 javascript: 协议
+		.trim(); // 移除首尾空格
+};
+
 
 // 表单引用
 const registerFormRef = ref(null)
@@ -88,15 +84,35 @@ const registerForm = reactive({
 // 表单验证规则
 const rules = {
 	username: [
-		{required: true, message: '请输入用户名', trigger: 'blur'},
-		{min: 3, max: 20, message: '用户名长度应在3到20个字符之间', trigger: 'blur'}
+		{ required: true, message: '请输入用户名', trigger: 'blur' },
+		{ min: 3, max: 20, message: '用户名长度应在3到20个字符之间', trigger: 'blur' },
+		{
+			validator: (rule, value, callback) => {
+				if (!/^[a-zA-Z0-9_-]{3,20}$/.test(value)) {
+					callback(new Error('用户名只能包含字母、数字、下划线和短横线'))
+				} else {
+					callback()
+				}
+			},
+			trigger: 'blur'
+		}
 	],
 	password: [
-		{required: true, message: '请输入密码', trigger: 'blur'},
-		{min: 8, max: 20, message: '密码长度应在8到20个字符之间', trigger: 'blur'}
+		{ required: true, message: '请输入密码', trigger: 'blur' },
+		{ min: 8, max: 20, message: '密码长度应在8到20个字符之间', trigger: 'blur' },
+		{
+			validator: (rule, value, callback) => {
+				if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[^<>'";\\/]+$/.test(value)) {
+					callback(new Error('密码必须包含大小写字母和数字，且不能包含特殊字符'));
+				} else {
+					callback();
+				}
+			},
+			trigger: 'blur'
+		},
 	],
 	confirmPassword: [
-		{required: true, message: '请确认密码', trigger: 'blur'},
+		{ required: true, message: '请确认密码', trigger: 'blur' },
 		{
 			validator: (rule, value, callback) => {
 				if (value !== registerForm.password) {
@@ -109,11 +125,11 @@ const rules = {
 		}
 	],
 	email: [
-		{required: true, message: '请输入邮箱', trigger: 'blur'},
-		{type: 'email', message: '请输入正确的邮箱地址', trigger: 'blur'}
+		{ required: true, message: '请输入邮箱', trigger: 'blur' },
+		{ type: 'email', message: '请输入正确的邮箱地址', trigger: 'blur' }
 	],
 	verification_code: [
-		{required: true, message: '请输入验证码', trigger: 'blur'}
+		{ required: true, message: '请输入验证码', trigger: 'blur' }
 	]
 }
 
@@ -126,8 +142,8 @@ const sendVerificationCode = async () => {
 	if (isSendingCode.value) return
 
 	// 验证邮箱格式
-	if (!registerForm.email) {
-		return ElMessage.error('请输入邮箱地址')
+	if (!registerForm.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(registerForm.email)) {
+		return ElMessage.error('请输入正确的邮箱地址');
 	}
 
 	isSendingCode.value = true
@@ -136,7 +152,7 @@ const sendVerificationCode = async () => {
 	try {
 		// 发送模拟请求
 		const response = await axios.post(
-			'http://127.0.0.1:8000/send-verification-code',
+			`${localUrl}/user/send-verification-code`,
 			{
 				email: registerForm.email
 			}
@@ -172,18 +188,25 @@ const submitForm = () => {
 		}
 
 		try {
+
+			const sanitizedForm = {
+				username: sanitizeInput(registerForm.username),
+				password: registerForm.password, // 密码不需要净化，因为已经在验证规则中限制了
+				email: registerForm.email.toLowerCase().trim(), // 邮箱转小写并去除空格
+				verification_code: sanitizeInput(registerForm.verification_code)
+			};
+
 			// 发送模拟请求
 			const response = await axios.post(
-				'http://127.0.0.1:8000/register',
+				`${localUrl}/user/register`,
+				sanitizedForm,
 				{
-					username: registerForm.username,
-					password: registerForm.password,
-					email: registerForm.email,
-					verification_code: registerForm.verification_code
+					timeout: 10000,
+					headers: {
+						'Content-Type': 'application/json'
+					}
 				},
-				{
-					timeout: 10000
-				}
+
 			)
 
 

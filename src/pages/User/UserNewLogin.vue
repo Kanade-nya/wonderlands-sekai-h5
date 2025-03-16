@@ -116,7 +116,7 @@ const handleLogin = async () => {
 			}
 			// 调用API
 			const response = await axios.post(
-				`${localUrl}/login`,
+				`${localUrl}/user/login`,
 				formData,
 				{
 					headers: {
@@ -142,11 +142,12 @@ const handleLogin = async () => {
 				router.replace('/')
 				console.log('登录成功')
 			} else {
-				ElMessage.error(response.message || '登录失败')
+				ElMessage.error(response.data.detail || '登录失败')
+				// ElMessage.error(response.message )
 			}
 		} catch (error) {
 			console.error('登录异常', error)
-			ElMessage.error(error.response.detail)
+			ElMessage.error(error.response.data.detail)
 		} finally {
 			loading.value = false
 		}
@@ -164,7 +165,7 @@ onMounted(() => {
 	if (!token) {
 		console.log('没有token')
 	} else {
-		axios.get(`${localUrl}/protected`, {
+		axios.get(`${localUrl}/user/protected`, {
 			headers: {
 				Authorization: `Bearer ${token}`
 			}

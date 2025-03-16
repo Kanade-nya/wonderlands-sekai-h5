@@ -22,27 +22,27 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import Mock from 'mockjs';
+// import Mock from 'mockjs';
 import axios from "axios";
 
 // Setup mock data
-const setupMockData = () => {
-	Mock.mock('/api/articles', 'get', {
-		'articles|8': [{
-			'id|+1': 1,
-			'title': '@ctitle(10, 30)',
-			'author': '@cname',
-			'time': '@integer(1, 30)天前',
-			'summary': '@cparagraph(1, 3)',
-			'image|1-10': 1,  // Random to determine if there's an image
-		}]
-	});
-};
+// const setupMockData = () => {
+// 	Mock.mock('/api/articles', 'get', {
+// 		'articles|8': [{
+// 			'id|+1': 1,
+// 			'title': '@ctitle(10, 30)',
+// 			'author': '@cname',
+// 			'time': '@integer(1, 30)天前',
+// 			'summary': '@cparagraph(1, 3)',
+// 			'image|1-10': 1,  // Random to determine if there's an image
+// 		}]
+// 	});
+// };
 
 // Fetch mock articles
 const articles = ref([]);
 const fetchArticles = async () => {
-	setupMockData();
+	// setupMockData();
 	try {
 		// In a real app, you would use axios or fetch
 		const response = await axios.get('/api/articles');

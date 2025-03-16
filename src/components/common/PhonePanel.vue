@@ -1,163 +1,167 @@
-<script setup lang="ts">
-import {useRouter} from "vue-router";
+<script setup>
+import { useRouter } from "vue-router";
 import { defineEmits } from "vue";
-const router = useRouter();
-const jump2Home = () => {
-	router.push('/')
-	emits('change-menu', 'false')
-}
+import { useUserInfoStore } from "@/stores/useUserInfoStore.js";
+import { computed } from 'vue';
+import { ElMessage,ElLoading } from 'element-plus';
 
-const jump2About = () => {
-	router.push('/about')
-	emits('change-menu', 'false')
-}
-
-const jump2Comments = () => {
-	router.push('/comments')
-	emits('change-menu', 'false')
-}
-
-const jump2Collection = () => {
-	router.push('/c/box')
-	emits('change-menu', 'false')
-}
-// const handleClick = (item: String) => {
-// 	if (item === 'Leo/need') {
-// 		router.push({
-// 			path: `/filter/Leo/pages/1`
-// 		})
-// 	} else {
-// 		router.push({
-// 			path: `/filter/${item}/pages/1`
-// 		})
-// 	}
-// 	emits('change-menu', 'false')
+// interface MenuItem {
+//   name: string;
+//   path: string;
+//   icon?: string;
 // }
 
-const emits = defineEmits(['change-menu'])
+// 导航菜单配置
+const navigationMenu = [
+  { name: '主页', path: '/' },
+  { name: '评论', path: '/comments' },
+  { name: '关于', path: '/about' },
+  { name: '合集', path: '/c/box' },
+  { name: '文章', path: '/co/articles' },
+  { name: '登录', path: '/user/login' }
+];
+
+// ... 其他 interface 和 navigationMenu 配置保持不变 ...
+const userInfoStore = useUserInfoStore();
+
+// 判断用户是否登录
+const isLoggedIn = computed(() => {
+  return userInfoStore.getUserInfo.isLogin;
+});
+// 功能菜单配置
+const featureMenu = [
+  { name: '个人信息', path: '/user/profile' },
+  { name: '投稿', path: '/user/post-record' },
+  { name: '退出登录', path: 'logout' }  // 添加退出登录选项
+];
+
+const router = useRouter();
+const emits = defineEmits(['change-menu']);
+
+// 统一的跳转处理函数
+const handleNavigation = (path) => {
+	if (path === 'logout') {
+    handleLogout();
+  } else {
+    // 如果是跳转到投稿记录页面，显示 loading
+    if (path === '/user/post-record') {
+      const loading = ElLoading.service({
+        text: '加载中...',
+        background: 'rgba(255, 255, 255, 0.7)'
+      });
+      router.push(path).finally(() => {
+        loading.close();
+      });
+    } else {
+      router.push(path);
+    }
+    emits('change-menu', 'false');
+  }
+};
+
+// 退出登录处理函数
+const handleLogout = () => {
+  // 清除 token
+  localStorage.removeItem('access_token');
+  // 重置用户状态
+  userInfoStore.clearUserInfo();
+  // 提示用户
+  ElMessage.success('已退出登录');
+  // 关闭菜单
+  emits('change-menu', 'false');
+  // 跳转到登录页
+  router.push('/');
+};
 </script>
 
 <template>
-	<div class="phone-panel-layout">
-		<div class="grid-container">
-			<div class="title">跳转</div>
-			<el-link :underline="false" @click="jump2Home" class="link">
-				<div class="grid-item">
-					<span>主页</span>
-				</div>
-			</el-link>
+  <div class="phone-panel-layout">
+    <!-- 导航菜单 -->
+    <div class="grid-container">
+      <div class="title">跳转</div>
+      <el-link 
+        v-for="item in navigationMenu" 
+        :key="item.path"
+        :underline="false" 
+        @click="handleNavigation(item.path)" 
+        class="link"
+      >
+        <div class="grid-item">
+          <span>{{ item.name }}</span>
+        </div>
+      </el-link>
+    </div>
 
-
-			<el-link :underline="false" @click="jump2Comments" class="link">
-				<div class="grid-item">
-					<span>评论</span>
-				</div>
-			</el-link>
-
-
-			<el-link :underline="false" @click="jump2About" class="link">
-				<div class="grid-item bar-about">
-					<span>关于</span>
-				</div>
-			</el-link>
-			<el-link :underline="false" @click="jump2Collection" class="link">
-				<div class="grid-item bar-about">
-					<span>合集</span>
-				</div>
-			</el-link>
-			<div class="link"></div>
-		</div>
-<!--		<div class="grid-container-x">-->
-<!--			<div class="title">分类</div>-->
-<!--			<div class="total-menu-item el-link" @click="handleClick('birthday')">-->
-<!--				&lt;!&ndash;				<i class="el-icon-document"></i>&ndash;&gt;-->
-<!--				<span>生日贺图</span>-->
-<!--			</div>-->
-<!--			<div class="total-menu-item el-link" @click="handleClick('celebration')">-->
-<!--				&lt;!&ndash;				<i class="el-icon-chat-line-round"></i>&ndash;&gt;-->
-<!--				<span>庆典贺图</span>-->
-<!--			</div>-->
-<!--			<div class="total-menu-item el-link" @click="handleClick('2dmv')">-->
-<!--				&lt;!&ndash;				<i class="el-icon-s-tools"></i>&ndash;&gt;-->
-<!--				<span>2DMV</span>-->
-<!--			</div>-->
-<!--			<div class="total-menu-item el-link" @click="handleClick('international')">-->
-<!--				&lt;!&ndash;				<i class="el-icon-s-promotion"></i>&ndash;&gt;-->
-<!--				<span>外服贺图</span>-->
-<!--			</div>-->
-<!--			<div class="total-menu-item el-link" @click="handleClick('design')">-->
-<!--				&lt;!&ndash;				<i class="el-icon-picture-outline-button"></i>&ndash;&gt;-->
-<!--				<span>人设/设计图</span>-->
-<!--			</div>-->
-<!--			<div class="total-menu-item el-link" @click="handleClick('others')">-->
-<!--				&lt;!&ndash;				<i class="el-icon-gift-box"></i>&ndash;&gt;-->
-<!--				<span>其他</span>-->
-<!--			</div>-->
-<!--		</div>-->
-	</div>
+    <!-- 功能菜单，只在用户登录时显示 -->
+    <div v-if="isLoggedIn" class="grid-container">
+      <div class="title">功能</div>
+      <el-link 
+        v-for="item in featureMenu" 
+        :key="item.path"
+        :underline="false" 
+        @click="handleNavigation(item.path)" 
+        class="link"
+      >
+        <div class="grid-item">
+          <span>{{ item.name }}</span>
+        </div>
+      </el-link>
+    </div>
+  </div>
 </template>
 
 <style scoped lang="scss">
 .phone-panel-layout {
+  box-sizing: border-box;
+  z-index: 1000;
+  display: flex;
+  padding: 20px 100px 0;
+  flex-direction: column;
+  width: 100%;
+  height: calc(100vh - 48px);
+  background: #ffffff;
 
-	box-sizing: border-box;
-	z-index: 1000;
-	display: flex;
-	padding: 20px 100px 0;
-	//justify-content: center;
-	//align-items: center;
-	flex-direction: column;
-	width: 100%;
-	height: calc(100vh - 48px);
-	background: #ffffff;
-	//opacity: 0.8;
-	.grid-container {
-		display: flex;
-		//flex-direction: column;
-		justify-content: center;
-		align-items: center;
-		font-size: 20px;
-		flex-wrap: wrap;
-		.link {
-			width: 50%;
-			font-size: 16px;
-		}
+  .grid-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
 
-		.title {
-			//border-bottom: 1px solid #eee;
-			//font-size: 18px;
-			//width: fit-content;
-			width: 100%;
-			text-align: center;
-			font-size: 20px;
-			font-weight: 500;
-			color: #606266;
-		}
+    .link {
+      width: 50%;
+      font-size: 16px;
+      padding: 8px 0;
+      
+      &:hover {
+        .grid-item {
+          color: #409EFF;
+          background-color: #F2F6FC;
+        }
+      }
+    }
 
-	}
-	.grid-container-x{
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		font-size: 20px;
-		flex-wrap: wrap;
-		.title {
-			//border-bottom: 1px solid #eee;
-			font-size: 18px;
-			width: 100%;
-			text-align: center;
-		}
+    .title {
+      width: 100%;
+      text-align: center;
+      font-size: 20px;
+      font-weight: 500;
+      color: #606266;
+      margin-bottom: 16px;
+    }
 
-		.total-menu-item {
-			box-sizing: border-box;
-			width: 50%;
-			cursor: pointer;
-			height: fit-content;
-			transition: all 0.2s ease-in-out;
-			//margin: 4px auto;
-			padding: 4px;
-			border-radius: 6px;
-		}
-	}
+    .grid-item {
+      padding: 8px 16px;
+      border-radius: 4px;
+      transition: all 0.3s ease;
+    }
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .phone-panel-layout {
+    padding: 20px 20px 0;
+  }
 }
 </style>

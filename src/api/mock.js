@@ -96,7 +96,7 @@ export default {
             try {
                 // 在实际项目中，这里会使用axios等工具发起HTTP请求
                 const xhr = new XMLHttpRequest()
-                xhr.open('post', `${baseUrl}/login`, true)
+                xhr.open('post', `${baseUrl}/user/login`, true)
                 xhr.setRequestHeader('Content-Type', 'application/json')
                 xhr.onreadystatechange = function() {
                     if (xhr.readyState === 4) {

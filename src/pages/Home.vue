@@ -11,13 +11,13 @@ import BoxComponent from "@/components/home/BoxComponent.vue";
 import Pages from "@/pages/Pages.vue";
 import {onMounted} from "vue";
 
-const setTime = '02-29'
+const setTime = '03-13'
 onMounted(()=>{
 	const lastNotification = localStorage.getItem('lastNotification')
 	if(lastNotification !== setTime){
 		ElNotification({
 			title: '新通知',
-			message: '合集功能已上线~有新功能建议可以在关于页面提交问卷~',
+			message: '帮我们测试一下登录功能！\n 右上角注册登录',
 			duration: 4500,
 		})
 		localStorage.setItem('lastNotification', setTime)

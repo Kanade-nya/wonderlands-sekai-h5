@@ -3,6 +3,7 @@ import {ref} from "vue";
 import UserProfileMain from "@/pages/User/Profile/UserProfileMain.vue";
 import {ArrowLeft} from "@element-plus/icons-vue";
 import UserProfileAvatar from "@/pages/User/Profile/UserProfileAvatar.vue";
+import UserProfileMeta from "@/pages/User/Profile/UserProfileMeta.vue";
 import {useRouter} from "vue-router";
 
 const router = useRouter()
@@ -24,12 +25,11 @@ const handleClick = () => {
 			<el-tabs v-model="activeName" class="demo-tabs">
 				<el-tab-pane label="基本资料" name="first"><user-profile-main></user-profile-main></el-tab-pane>
 				<el-tab-pane label="头像管理" name="second"><user-profile-avatar></user-profile-avatar></el-tab-pane>
-				<el-tab-pane label="Role" name="third">Role</el-tab-pane>
+				<el-tab-pane label="标签" name="third"><user-profile-meta></user-profile-meta></el-tab-pane>
 				<el-tab-pane label="Task" name="fourth">Task</el-tab-pane>
 			</el-tabs>
 		</el-card>
 	</div>
-
 </template>
 
 <style scoped lang="scss">
