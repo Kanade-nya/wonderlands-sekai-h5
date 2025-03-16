@@ -27,6 +27,8 @@ declare module 'vue' {
     ElCollapse: typeof import('element-plus/es')['ElCollapse']
     ElCollapseItem: typeof import('element-plus/es')['ElCollapseItem']
     ElColorPicker: typeof import('element-plus/es')['ElColorPicker']
+    ElDescriptions: typeof import('element-plus/es')['ElDescriptions']
+    ElDescriptionsItem: typeof import('element-plus/es')['ElDescriptionsItem']
     ElDialog: typeof import('element-plus/es')['ElDialog']
     ElDivider: typeof import('element-plus/es')['ElDivider']
     ElEmpty: typeof import('element-plus/es')['ElEmpty']
@@ -78,5 +80,8 @@ declare module 'vue' {
     UploadImage: typeof import('./src/components/uploader/UploadImage.vue')['default']
     UserMenuPanel: typeof import('./src/components/common/UserMenuPanel.vue')['default']
     VerticalMenu: typeof import('./src/components/grid/VerticalMenu.vue')['default']
+  }
+  export interface ComponentCustomProperties {
+    vLoading: typeof import('element-plus/es')['ElLoadingDirective']
   }
 }

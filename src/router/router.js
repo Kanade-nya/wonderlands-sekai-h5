@@ -2,8 +2,14 @@ import { createRouter, createWebHistory, createWebHashHistory } from 'vue-router
 // import { validateUserToken } from '@/utils/user';
 // ... 其他导入保持不变 ...
 import { ElLoading } from 'element-plus';
+import MercariList from '@/pages/Test/MercariList.vue';
 
 const routes = [
+    // {
+    //     path: '/mercari',
+    //     name: 'MercariList',
+    //     component: MercariList
+    //   },
     {
         path: '/pages/:page_id',
         name: 'pages',

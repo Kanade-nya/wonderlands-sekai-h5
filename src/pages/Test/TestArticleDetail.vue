@@ -31,12 +31,12 @@
 </template>
 
 <script setup>
-import { ref, onMounted,computed } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { ElMessage } from 'element-plus';
 import UserComments from "@/pages/User/UserComments.vue";
 import axios from "axios";
-import { localUrl ,formatDate} from "@/utils/methods.js";
+import { localUrl, formatDate } from "@/utils/methods.js";
 import { defaultAvatar } from "@/utils/user.js";
 import MarkdownContent from "./MarkdownContent.vue";
 
@@ -44,24 +44,43 @@ const route = useRoute();
 const article = ref(null);
 
 
-
-
 // 获取文章详情
 const fetchArticleDetail = async () => {
+
 	try {
 		const articleId = route.params.id;
 		if (!articleId) {
 			ElMessage.error('文章ID不存在');
 			return;
 		}
-		
+
 		const response = await axios.get(`${localUrl}/articles/articles/${articleId}`);
 		if (response.data) {
 			article.value = response.data;
 			// 处理文章内容，如果需要的话
 			if (article.value.content) {
-				// 可以在这里对内容进行额外处理，例如添加样式或格式化
-				article.value.content = article.value.content.replace(/\n/g, '<br>');
+				// 替换换行符
+				let content = article.value.content.replace(/\n/g, '<br>');
+
+				// 为所有图片添加懒加载属性
+				const imgReg = /<img(.*?)src=["'](.*?)["'](.*?)>/gi;
+				content = content.replace(imgReg, (match) => {
+					// 检查是否已经有 v-lazy 属性
+					if (match.includes('v-lazy')) {
+						return match;
+					}
+					// 提取 src 属性
+					const srcMatch = match.match(/src=["'](.*?)["']/i);
+					if (srcMatch && srcMatch[1]) {
+						const src = srcMatch[1];
+						// 替换 src 为 v-lazy
+						return match.replace(/src=["'](.*?)["']/i, `src="${src}" loading="lazy" element-loading-text="加载中"`);
+					}
+
+					return match;
+				});
+
+				article.value.content = content;
 			}
 		} else {
 			ElMessage.error('获取文章详情失败');
@@ -157,7 +176,7 @@ onMounted(() => {
 			margin: 1.5em 0;
 			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 			transition: transform 0.3s ease;
-			
+
 			&:hover {
 				transform: scale(1.01);
 			}
@@ -168,7 +187,12 @@ onMounted(() => {
 			letter-spacing: 0.5px;
 		}
 
-		:deep(h1), :deep(h2), :deep(h3), :deep(h4), :deep(h5), :deep(h6) {
+		:deep(h1),
+		:deep(h2),
+		:deep(h3),
+		:deep(h4),
+		:deep(h5),
+		:deep(h6) {
 			font-weight: 600;
 			margin: 1.5em 0 0.8em;
 			color: #222;
@@ -195,7 +219,7 @@ onMounted(() => {
 			color: #0366d6;
 			text-decoration: none;
 			transition: color 0.2s ease;
-			
+
 			&:hover {
 				color: #0056b3;
 				text-decoration: underline;
@@ -209,13 +233,14 @@ onMounted(() => {
 			margin: 1.5em 0;
 			background-color: #f8f9fa;
 			border-radius: 0 4px 4px 0;
-			
+
 			p {
 				margin: 1em 0;
 			}
 		}
 
-		:deep(ul), :deep(ol) {
+		:deep(ul),
+		:deep(ol) {
 			padding-left: 2em;
 			margin: 1em 0;
 		}
@@ -238,7 +263,7 @@ onMounted(() => {
 			padding: 16px;
 			overflow: auto;
 			margin: 1.5em 0;
-			
+
 			code {
 				background-color: transparent;
 				padding: 0;
@@ -254,21 +279,22 @@ onMounted(() => {
 			width: 100%;
 			margin: 1.5em 0;
 			overflow: auto;
-			
-			th, td {
+
+			th,
+			td {
 				border: 1px solid #dfe2e5;
 				padding: 8px 12px;
 			}
-			
+
 			th {
 				background-color: #f6f8fa;
 				font-weight: 600;
 			}
-			
+
 			tr:nth-child(even) {
 				background-color: #f8f9fa;
 			}
-			
+
 			tr:hover {
 				background-color: #f1f4f7;
 			}
@@ -326,8 +352,4 @@ onMounted(() => {
 		}
 	}
 }
-
-
-
-
 </style>
