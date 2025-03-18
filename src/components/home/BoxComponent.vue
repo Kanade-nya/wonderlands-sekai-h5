@@ -1,40 +1,27 @@
 <template>
 	<!-- 'border': `1px solid ${characterColors.find(item => item.name === box.character).color}`, 	-->
 	<div class="boxes-container">
-		<div class="box" v-for="(box, index) in boxes"
-		     :key="index"
-		     :style="{'--var-color': `${characterColors.find(item => item.name === box.character).color}` }"
-		>
+		<div class="box" v-for="(box, index) in boxes" :key="index"
+			:style="{ '--var-color': `${characterColors.find(item => item.name === box.character).color}` }">
 
 
-			<FilterBoxContent :author="box.illustrator"
-			            :title="box.title"
-			            :time="box.create_date"
-			            :src="box.cover"
-			            :box="box"
-
-			/>
+			<FilterBoxContent :author="box.illustrator" :title="box.title" :time="box.create_date" :src="box.cover"
+				:box="box" />
 		</div>
 	</div>
 
-	<div class="pagination" :style="{display: showPagination === false ? 'none': 'flex' }">
-		<el-pagination
-			layout="prev, pager, next"
-			background
-			:total="totalDataCount"
-			v-model:current-page="currPage"
-			:default-page-size=12
-			:pager-count="userAgent === 'PC' ? 8 : 4"
-		></el-pagination>
+	<div class="pagination" :style="{ display: showPagination === false ? 'none' : 'flex' }">
+		<el-pagination layout="prev, pager, next" background :total="totalDataCount" v-model:current-page="currPage"
+			:default-page-size=12 :pager-count="userAgent === 'PC' ? 8 : 4"></el-pagination>
 	</div>
 </template>
 
 <script setup>
 import BoxContent from './BoxContent.vue';
-import {onMounted, ref, watch} from "vue";
+import { onMounted, ref, watch } from "vue";
 import axios from "axios";
-import {baseUrl, characterColors} from "@/utils/methods.js";
-import {useRoute, useRouter} from "vue-router";
+import { baseUrl, characterColors } from "@/utils/methods.js";
+import { useRoute, useRouter } from "vue-router";
 import requests from "@/utils/requests.js";
 import FilterBoxContent from "@/components/filter/FilterBoxContent.vue";
 import CollectionBox from "@/components/collection/CollectionBox.vue";
@@ -169,17 +156,17 @@ onMounted(() => {
 })
 
 watch(currPage, (newValue, oldValue) => {
-		if (oldValue !== 0) {
-			boxes.value.length = 0 // 清除box
-			scrollTo(0, 0)
-			router.push({
-				path: `/pages/${newValue}`
-			})
+	if (oldValue !== 0) {
+		boxes.value.length = 0 // 清除box
+		scrollTo(0, 0)
+		router.push({
+			path: `/pages/${newValue}`
+		})
 		// updateValue(newValue)
-		}
-	}, {
-		immediate: false
 	}
+}, {
+	immediate: false
+}
 )
 
 
@@ -233,27 +220,79 @@ const updateValue = (updateId = page_id) => {
 }
 
 .boxes-container {
-	display: grid;
-	//grid-template-columns: repeat(3, 1fr);
-	grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
+	display: flex;
+	flex-wrap: wrap;
 	gap: 10px;
 	cursor: pointer;
 
-	transition: box-shadow 0.2s ease-in-out;
-
 	& > .box {
+		flex: 0 0 calc(33.333% - 7px); // 三列布局，考虑间距
 		border: 1px solid #eee;
 		padding: 10px;
 		border-radius: 4px;
 		transition: box-shadow 0.2s ease-in-out;
+		box-sizing: border-box;
 
 		&:hover {
 			box-shadow: 0 0 5px var(--var-color);
 		}
-
+	}
+	
+	// 添加媒体查询，针对移动设备优化布局
+	@media screen and (max-width: 768px) {
+		& > .box {
+			flex: 0 0 calc(50% - 5px); // 平板设备显示两列
+			padding: 8px;
+		}
 	}
 
+	@media screen and (max-width: 480px) {
+		& > .box {
+			flex: 0 0 100%; // 手机设备显示单列
+			padding: 10px;
+		}
+	}
+}
 
+// 确保图片在容器内正确显示
+:deep(.box-content) {
+	width: 100%;
+
+	img {
+		width: 100%;
+		height: auto;
+		object-fit: cover;
+		min-height: 150px; // 添加最小高度确保图片显示完整
+	}
+}
+
+// 针对移动端优化图片显示
+@media screen and (max-width: 768px) {
+	:deep(.box-content) {
+		.box-image {
+			min-height: 120px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			
+			img {
+				max-height: 200px;
+				object-position: center;
+			}
+		}
+	}
+}
+
+@media screen and (max-width: 480px) {
+	:deep(.box-content) {
+		.box-image {
+			min-height: 180px; // 在手机上增加最小高度
+			
+			img {
+				max-height: 250px;
+			}
+		}
+	}
 }
 
 //.box:hover {

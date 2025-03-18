@@ -74,10 +74,38 @@ const clickToDetails = () => {
 </script>
 
 <style lang="scss" scoped>
-@media screen and (max-width: 768px) {
-	.box > .box-content > .box-image {
-		min-height: 100px;
+// 添加以下样式确保图片响应式显示
+.box-image {
+	width: 100%;
+	position: relative;
+	overflow: hidden;
+	
+	img {
+		width: 100%;
+		height: auto;
+		display: block;
+		transition: transform 0.3s ease;
 	}
+}
+
+// 其他现有样式...
+
+// 添加媒体查询
+@media screen and (max-width: 768px) {
+	.box-title {
+		font-size: 14px; // 减小标题字体大小
+	}
+	
+	.box-info {
+		font-size: 12px; // 减小信息字体大小
+	}
+}
+
+
+@media screen and (max-width: 768px) {
+	// .box > .box-content > .box-image {
+	// 	min-height: 100px;
+	// }
 	.info-detail {
 		display: flex;
 		flex-direction: column;

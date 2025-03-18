@@ -138,22 +138,48 @@ watch(currPage, (newValue, oldValue) => {
 }
 
 .boxes-container {
-	display: grid;
-	grid-template-columns: repeat(3, 1fr);
+	display: flex;
+	flex-wrap: wrap;
 	gap: 10px;
 	cursor: pointer;
 
-	transition: box-shadow 0.2s ease-in-out;
-
 	& > .box {
+		flex: 0 0 calc(33.333% - 7px); // 三列布局，考虑间距
 		border: 1px solid #eee;
 		padding: 10px;
 		border-radius: 4px;
 		transition: box-shadow 0.2s ease-in-out;
+		box-sizing: border-box;
 
 		&:hover {
 			box-shadow: 0 0 5px var(--var-color);
 		}
+	}
+	
+	// 添加媒体查询，针对移动设备优化布局
+	@media screen and (max-width: 768px) {
+		& > .box {
+			flex: 0 0 calc(50% - 5px); // 平板设备显示两列
+			padding: 8px;
+		}
+	}
+
+	@media screen and (max-width: 480px) {
+		& > .box {
+			flex: 0 0 100%; // 手机设备显示单列
+			padding: 10px;
+		}
+	}
+}
+
+// 确保图片在容器内正确显示
+:deep(.box-content) {
+	width: 100%;
+	
+	img {
+		width: 100%;
+		height: auto;
+		object-fit: cover;
 	}
 }
 </style>
