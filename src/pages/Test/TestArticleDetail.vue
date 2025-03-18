@@ -43,6 +43,10 @@ import MarkdownContent from "./MarkdownContent.vue";
 const route = useRoute();
 const article = ref(null);
 
+// 检测是否为PC设备
+const isPC = computed(() => {
+  return window.innerWidth >= 768; // 通常768px是移动设备和PC设备的分界点
+});
 
 // 获取文章详情
 const fetchArticleDetail = async () => {
@@ -73,8 +77,10 @@ const fetchArticleDetail = async () => {
 					const srcMatch = match.match(/src=["'](.*?)["']/i);
 					if (srcMatch && srcMatch[1]) {
 						const src = srcMatch[1];
-						// 替换 src 为 v-lazy
-						return match.replace(/src=["'](.*?)["']/i, `src="${src}" loading="lazy" element-loading-text="加载中"`);
+						// 根据设备类型设置图片宽度
+						const imgWidth = isPC.value ? 'width: 50%; margin: 8px auto; display: block;' : 'width: 100%;';
+						// 替换 src 为 v-lazy 并添加样式
+						return match.replace(/src=["'](.*?)["']/i, `src="${src}" loading="lazy" element-loading-text="加载中" style="${imgWidth}"`);
 					}
 
 					return match;
@@ -166,7 +172,7 @@ onMounted(() => {
 		font-size: 16px;
 		line-height: 1.8;
 		color: #333;
-		margin-bottom: 30px;
+		// margin-bottom: 30px;
 		padding: 0 10px;
 
 		:deep(img) {

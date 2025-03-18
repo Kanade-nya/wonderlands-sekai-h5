@@ -38,7 +38,7 @@ const topArt = ref({
 			"author_name": "Saya",
 			"author_id": 4,
 			"author_avatar": "https://user-1304757492.cos.ap-guangzhou.myqcloud.com/images/1741436372019_0807a192206dc23a09873aa2d63fb524ef6c77db.jpg",
-			"content": "<h2>文章发布指南 0.0.1（?）</h2><h3>做这个功能的目的：</h3><p>可以上传一些除了单纯的插画之外的东西，例如小漫画，官方其他投稿，图片等等</p><h3>现有功能：</h3><p>除了喜闻乐见的注册登录上传功能之外，评论功能也是可以正常使用的，编辑功能正在开发中。</p><p>添加了一个小功能，可以给自己加TAG，会在评论的同时显示出来</p><h3>限制：</h3><p>没有，正常使用即可</p><h3>插件库：</h3><p>vue3 + scss + element-ui / wangEditor / fastapi</p>",
+			"content": "<h2>文章发布指南 0.0.1（?）</h2><p>上传图片之后时候可以控制图片大小，建议居中 50%,观看效果更佳</p><h3>做这个功能的目的：</h3><p>可以上传一些除了单纯的插画之外的东西，例如小漫画，官方其他投稿，图片等等</p><h3>现有功能：</h3><p>除了喜闻乐见的注册登录上传功能之外，评论功能也是可以正常使用的，编辑功能正在开发中。</p><p>添加了一个小功能，可以给自己加TAG，会在评论的同时显示出来</p><h3>限制：</h3><p>没有，正常使用即可</p><h3>插件库：</h3><p>vue3 + scss + element-ui / wangEditor / fastapi</p>",
 			"content_preview": "<h2>文章发布指南 0.0.1（?）</h2><h3>做这个功能的目的：</h3><p>可以上传一些除了单纯的插画之外的东西，例如小漫画，官方其他投稿，图片等等</p><h3>现有功能：</h3><...",
 			"title": "文章发布指南（?）",
 			"theme": "发布指南",
@@ -161,7 +161,7 @@ onMounted(() => {
 	max-width: 1200px;
 	margin: 0 auto;
 	padding: 24px;
-	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+	// font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 
 
 	/* 添加无数据样式 */
