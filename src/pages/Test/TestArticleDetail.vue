@@ -78,7 +78,7 @@ const fetchArticleDetail = async () => {
 					if (srcMatch && srcMatch[1]) {
 						const src = srcMatch[1];
 						// 根据设备类型设置图片宽度
-						const imgWidth = isPC.value ? 'width: 50%; margin: 8px auto; display: block;' : 'width: 100%;';
+						const imgWidth = isPC.value ? 'width: 50%; margin: 8px auto; display: block;' : 'width: 100%;margin: 0 auto; display: block;';
 						// 替换 src 为 v-lazy 并添加样式
 						return match.replace(/src=["'](.*?)["']/i, `src="${src}" loading="lazy" element-loading-text="加载中" style="${imgWidth}"`);
 					}

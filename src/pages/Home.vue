@@ -17,7 +17,7 @@ onMounted(()=>{
 	if(lastNotification !== setTime){
 		ElNotification({
 			title: '新通知',
-			message: '帮我们测试一下登录功能！\n 右上角注册登录',
+			message: '页面高频迭代中，如果用户信息出现报错，请尝试重新登录',
 			duration: 4500,
 		})
 		localStorage.setItem('lastNotification', setTime)

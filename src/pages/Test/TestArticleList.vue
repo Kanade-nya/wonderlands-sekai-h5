@@ -7,6 +7,7 @@ import { localUrl, formatDate, formatDate2 } from "@/utils/methods.js";
 import { defaultAvatar } from "@/utils/user.js"
 import Default from "@tinymce/tinymce-vue";
 import { CaretTop, Top } from "@element-plus/icons-vue";
+import requests from "@/utils/requests.js";
 const router = useRouter();
 
 // 格式化内容，去除markdown标识符
@@ -57,7 +58,7 @@ const fetchArticles = async () => {
 	loading.value = true;
 
 	try {
-		const response = await axios.get(localUrl + '/articles/articles');
+		const response = await requests.get(localUrl + '/articles/articles');
 		// console.log('response: ', response)
 		if (response.data && response.data.length > 0) {
 			showTopArt.value = true;

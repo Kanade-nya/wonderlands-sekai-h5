@@ -11,7 +11,9 @@
 					</span>
 				</div>
 			</div>
+
 		</template>
+	
 		<!-- <template>导航栏卡槽</template>
 		<template #header>头部卡槽</template>
 		<template #action="{ user }">动作卡槽{{ user.username }}</template>
@@ -408,6 +410,30 @@ const submit = ({ content, parentId, finish }) => {
 			transform: translateY(-1px);
 			cursor: pointer;
 		}
+	}
+}
+
+// 添加媒体查询，针对移动设备进行优化
+@media (max-width: 768px) {
+	.user-info-custom {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 4px;
+		
+		.tags-container {
+			width: 100%;
+			margin-top: 2px;
+		}
+		
+		.user-tag {
+			font-size: 10px;
+			padding: 0 4px;
+			height: 20px;
+		}
+	}
+	
+	:deep(.user-info) {
+		flex-wrap: wrap;
 	}
 }
 </style>

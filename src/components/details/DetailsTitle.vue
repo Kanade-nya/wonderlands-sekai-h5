@@ -67,5 +67,38 @@ const props = defineProps({
 			margin-left: 10px;
 		}
 	}
+	
+	// 添加移动端适配样式
+	@media screen and (max-width: 768px) {
+		padding: 8px 10px;
+		
+		.title {
+			font-size: 20px;
+			line-height: 1.3;
+			margin-bottom: 8px;
+			word-break: break-word;
+			
+			// 调整标题和角色名之间的间距
+			span {
+				margin-right: 10px !important;
+			}
+		}
+		
+		.meta-info {
+			flex-wrap: wrap;
+			
+			span {
+				font-size: 13px;
+				margin-bottom: 4px;
+			}
+		}
+	}
+	
+	// 更小屏幕的适配
+	@media screen and (max-width: 480px) {
+		.title {
+			font-size: 18px;
+		}
+	}
 }
 </style>

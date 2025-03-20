@@ -66,7 +66,7 @@ const content = toRef(props, 'content')
   font-size: 16px;
   line-height: 1.8;
   color: #333;
-  margin-bottom: 30px;
+  // margin-bottom: 30px;
 
   // ... 原有样式保持不变 ...
 }

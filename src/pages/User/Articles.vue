@@ -71,7 +71,7 @@ onMounted(() => {
 	max-width: 1200px;
 	margin: 0 auto;
 	padding: 20px;
-	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+	// font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 
 	.article-item {
 		padding: 20px 0;

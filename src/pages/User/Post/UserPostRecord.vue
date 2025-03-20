@@ -17,8 +17,8 @@
 				</el-tab-pane>
 
 				<el-tab-pane label="历史投稿" name="history">
-					<!--					<UserPostPublicationHistory @edit-publication="handleEditPublication" ref="publicationHistoryRef" />-->
-					<later-open></later-open>
+					<UserPostPublicationHistory @edit-publication="handleEditPublication" ref="publicationHistoryRef" />
+<!--					<later-open></later-open>-->
 				</el-tab-pane>
 			</el-tabs>
 		</el-card>

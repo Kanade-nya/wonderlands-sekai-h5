@@ -130,7 +130,7 @@ import { ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import axios from 'axios'
 
-const API_BASE_URL = 'http://127.0.0.1:8001/api/mercari'
+const API_BASE_URL = 'http://127.0.0.1:8000/mercari/api/mercari'
 
 const mercariData = ref([])
 const loading = ref(false)
@@ -175,11 +175,11 @@ const fetchData = async () => {
     // 更新为新的响应格式
     mercariData.value = response.data.items
     total.value = response.data.total
-    // 如果当前页大于总页数，回到第一页
-    if (currentPage.value > response.data.total_pages) {
-      currentPage.value = 1
-      await fetchData()
-    }
+    // // 如果当前页大于总页数，回到第一页
+    // if (currentPage.value > response.data.total_pages) {
+    //   currentPage.value = 1
+    //   await fetchData()
+    // }
   } catch (error) {
     ElMessage.error('获取数据失败')
     console.error('Error fetching data:', error)

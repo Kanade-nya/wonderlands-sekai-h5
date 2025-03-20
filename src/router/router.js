@@ -5,11 +5,11 @@ import { ElLoading } from 'element-plus';
 import MercariList from '@/pages/Test/MercariList.vue';
 
 const routes = [
-    // {
-    //     path: '/mercari',
-    //     name: 'MercariList',
-    //     component: MercariList
-    //   },
+    {
+        path: '/mercari',
+        name: 'MercariList',
+        component: MercariList
+      },
     {
         path: '/pages/:page_id',
         name: 'pages',
