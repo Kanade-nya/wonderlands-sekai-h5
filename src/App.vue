@@ -1,6 +1,6 @@
 <script setup>
 import HelloWorld from './components/HelloWorld.vue'
-// import NavBar from "./components/NavBar.vue";
+// import NavBar from "./Unit/NavBar.vue";
 import NavBar from "@/components/common/NavBar.vue";
 import Home from "@/pages/Home.vue";
 import FooterBar from "@/components/common/FooterBar.vue";
@@ -13,6 +13,9 @@ const route = useRoute();
 import { onMounted, watch } from "vue";
 import { useGetIpStore } from "@/stores/useGetIpStore.js";
 import { useUserInfoStore } from "@/stores/useUserInfoStore.js";
+// 调用userData数据
+import { useUserData } from "@/stores/useUserData.js";
+const userData = useUserData();
 
 import axios from "axios";
 import { ElMessage } from "element-plus";
@@ -25,8 +28,10 @@ const useUserInfo = useUserInfoStore();
 const validateUserToken = async () => {
 	const token = localStorage.getItem('access_token')
 	if (!token) {
-		console.log('没有token，去登录')
-		useUserInfo.unLoginLoadingSuccess()
+		console.log('没有token, 去登录')
+    userData.setUserData({
+      isLogin: -1
+    })
 		return false
 	}
 
@@ -39,13 +44,23 @@ const validateUserToken = async () => {
 
 		if (response.status === 200) {
 			ElMessage.success(`欢迎回来，${response.data.user_info.username}`)
-			useUserInfo.setUserInfo(response.data.user_info)
+      userData.setUserData({
+        isLogin: 1,
+        ...response.data.user_info,
+      })
+			// useUserInfo.setUserInfo(response.data.user_info)
 			return true
 		} else {
+      userData.setUserData({
+        isLogin: -2
+      })
 			return false
 		}
 	} catch (error) {
-		console.error('验证token失败', error)
+		// console.error('验证token失败', error)
+    userData.setUserData({
+        isLogin: -2
+      })
 		return false
 	}
 }
@@ -67,18 +82,19 @@ watch(() => useUserInfo.getUserInfo.loadingSuccess, (newValue) => {
 const currentRoute = computed(() => {
 	return route.path.startsWith('/user')
 })
+
 const currentRouteIsCo = computed(() => {
 	return route.path.startsWith('/co')
 })
 
-// 添加投稿分类数据
-const contributionCategories = ref([
-	{ id: 1, name: '全部', icon: 'Menu' },
-	{ id: 2, name: '原创', icon: 'Edit' },
-	{ id: 3, name: '翻译', icon: 'Document' },
-	{ id: 4, name: '转载', icon: 'CopyDocument' },
-	{ id: 5, name: '资源', icon: 'Folder' }
-]);
+// // 添加投稿分类数据
+// const contributionCategories = ref([
+// 	{ id: 1, name: '全部', icon: 'Menu' },
+// 	{ id: 2, name: '原创', icon: 'Edit' },
+// 	{ id: 3, name: '翻译', icon: 'Document' },
+// 	{ id: 4, name: '转载', icon: 'CopyDocument' },
+// 	{ id: 5, name: '资源', icon: 'Folder' }
+// ]);
 
 const activeCategory = ref(1);
 
@@ -91,14 +107,10 @@ const handleCategoryChange = (id) => {
 <template>
 <!-- 用户登录 -->
 	<div v-if="currentRoute">
-		<div class="full-main-body">
-			<div class="full-main-page-bg">
-				<div class="main-page-layout">
-					<router-view :key="route.fullPath"></router-view>
-				</div>
-			</div>
+    <NavBar></NavBar>
+			<router-view :key="route.fullPath"></router-view>
 			<FooterBar></FooterBar>
-		</div>
+	
 	</div>
 	<!-- bbs -->
 	<div v-else class="contribution-layout">
@@ -135,34 +147,36 @@ const handleCategoryChange = (id) => {
 </template>
 
 <style scoped lang="scss">
-.full-main-body {}
+.full-main-body {
+  background-color: white;
+}
 
 .main-body {
-	overflow: visible;
+  overflow: visible;
 }
 
 .main-page-bg {
-	width: 100%;
-	background: #eee;
-	min-height: 100vh;
-	display: flex;
-	padding-bottom: 20px;
+  width: 100%;
+  background: #f5f7fa;
+  min-height: 100vh;
+  display: flex;
+  padding-bottom: 20px;
 
-	.main-page-layout {
-		box-sizing: border-box;
-		width: 1140px;
-		padding: 12px 16px;
-		margin: 20px auto 0;
-		background: white;
-		min-height: 100vh;
-		border-radius: 2px;
-		//border: 1px solid black;
-	}
+  .main-page-layout {
+    box-sizing: border-box;
+    width: 1140px;
+    padding: 24px;
+    margin: 20px auto 0;
+    background: white;
+    min-height: 100vh;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+  }
 }
 
 // 投稿页面样式
 .contribution-layout {
-
   background-color: #f5f7fa;
   min-height: 100vh;
   display: flex;
@@ -185,7 +199,7 @@ const handleCategoryChange = (id) => {
     font-size: 28px;
     font-weight: 600;
     color: #303133;
-    margin-bottom: 8px;
+    margin-bottom: 12px;
   }
   
   .page-description {
@@ -200,9 +214,9 @@ const handleCategoryChange = (id) => {
     align-items: center;
     margin-bottom: 16px;
     background-color: #fff;
-    border-radius: 8px;
+    border-radius: 12px;
     padding: 16px 24px;
-    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
     
     .custom-tabs {
       flex: 1;
@@ -232,9 +246,9 @@ const handleCategoryChange = (id) => {
 
 .contribution-content {
   background-color: #fff;
-  border-radius: 8px;
+  border-radius: 12px;
   padding: 24px;
-  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
   min-height: 600px;
 }
 
@@ -268,20 +282,18 @@ const handleCategoryChange = (id) => {
   .contribution-content {
     padding: 16px;
   }
-}
+  
+  .main-page-bg {
+    width: 100%;
+    padding: 0;
 
-
-@media screen and (max-width: 768px) {
-	.main-page-bg {
-		width: 100%;
-		padding: 0;
-
-		.main-page-layout {
-			box-sizing: border-box;
-			width: 100%;
-			padding: 12px 6px;
-			margin-top: 0;
-		}
-	}
+    .main-page-layout {
+      box-sizing: border-box;
+      width: 100%;
+      padding: 16px;
+      margin-top: 0;
+      border-radius: 0;
+    }
+  }
 }
 </style>

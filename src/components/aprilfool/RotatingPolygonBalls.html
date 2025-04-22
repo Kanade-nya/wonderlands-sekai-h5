@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>旋转多边形物理碰撞</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        canvas {
+            border: 1px solid #ccc;
+            background-color: #fff;
+        }
+        .controls {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        button {
+            padding: 8px 15px;
+            margin: 5px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="controls">
+        <button id="addBall">添加小球</button>
+        <button id="reset">重置</button>
+    </div>
+    <canvas id="canvas"></canvas>
+
+    <script>
+        // 初始化Matter.js模块
+        const { Engine, Render, Runner, Bodies, Composite, Body, Vector, Vertices, Common, Events } = Matter;
+
+        // 创建引擎
+        const engine = Engine.create({
+            gravity: { x: 0, y: 1, scale: 0.001 } // 调整重力
+        });
+        const world = engine.world;
+
+        // 设置画布尺寸
+        const canvas = document.getElementById('canvas');
+        const width = 800;
+        const height = 600;
+        canvas.width = width;
+        canvas.height = height;
+
+        // 创建渲染器
+        const render = Render.create({
+            canvas: canvas,
+            engine: engine,
+            options: {
+                width: width,
+                height: height,
+                wireframes: false,
+                background: '#ffffff',
+                showAngleIndicator: false
+            }
+        });
+
+        // 中心点
+        const centerX = width / 2;
+        const centerY = height / 2;
+
+        // 多边形配置 - 修改为固定六边形
+        const polygonLayers = [];
+        const layerCount = 5; // 设置5层六边形
+        const startRadius = 80; // 最内层半径
+        const radiusIncrement = 100; // 每层半径增量
+        
+        // 创建多层六边形配置
+        for (let i = 0; i < layerCount; i++) {
+            polygonLayers.push({
+                sides: 6, // 固定为六边形
+                radius: startRadius + i * radiusIncrement,
+                color: getRandomColor(), // 随机颜色
+                rotationSpeed: (i % 2 === 0 ? 1 : -1) * (0.001 + i * 0.0005), // 交替旋转方向
+                gapIndex: Math.floor(Math.random() * 6) // 随机选择一个边作为空边
+            });
+        }
+
+        // 创建多边形
+        const polygons = [];
+
+        polygonLayers.forEach(layer => {
+            const polygonSegments = createHexagonWithGap(
+                centerX, 
+                centerY, 
+                layer.radius, 
+                layer.color,
+                layer.rotationSpeed,
+                layer.gapIndex
+            );
+            polygonSegments.forEach(segment => {
+                polygons.push(segment);
+                Composite.add(world, segment);
+            });
+        });
+
+        // 创建带空边的六边形函数
+        function createHexagonWithGap(x, y, radius, color, rotationSpeed, gapIndex) {
+            const segments = [];
+            const sides = 6;
+            const angle = Math.PI * 2 / sides;
+            
+            // 为每个边创建一个线段，除了缺口处
+            for (let i = 0; i < sides; i++) {
+                // 跳过空边
+                if (i === gapIndex) continue;
+                
+                // 计算当前边的起点和终点
+                const startAngle = angle * i;
+                const endAngle = angle * (i + 1);
+                
+                const startX = x + radius * Math.cos(startAngle);
+                const startY = y + radius * Math.sin(startAngle);
+                const endX = x + radius * Math.cos(endAngle);
+                const endY = y + radius * Math.sin(endAngle);
+                
+                // 创建厚度为10的线段
+                const thickness = 10;
+                const dx = endX - startX;
+                const dy = endY - startY;
+                const length = Math.sqrt(dx * dx + dy * dy);
+                const segmentAngle = Math.atan2(dy, dx);
+                
+                const segment = Bodies.rectangle(
+                    (startX + endX) / 2,
+                    (startY + endY) / 2,
+                    length,
+                    thickness,
+                    {
+                        isStatic: true,
+                        angle: segmentAngle,
+                        render: {
+                            fillStyle: color,
+                            strokeStyle: '#000',
+                            lineWidth: 1
+                        },
+                        layer: radius, // 存储所属层的半径，用于旋转
+                        rotationSpeed: rotationSpeed,
+                        friction: 0.1,
+                        restitution: 0.8
+                    }
+                );
+                
+                segments.push(segment);
+            }
+            
+            return segments;
+        }
+
+        // 旋转多边形
+        Events.on(engine, 'beforeUpdate', function() {
+            // 旋转每个线段
+            polygons.forEach(polygon => {
+                // 找到这个线段属于哪个旋转中心
+                const layer = polygonLayers.find(l => Math.abs(l.radius - polygon.layer) < 1);
+                
+                if (layer) {
+                    // 计算当前位置相对于中心的角度
+                    const currentAngle = Math.atan2(
+                        polygon.position.y - centerY,
+                        polygon.position.x - centerX
+                    );
+                    
+                    // 计算新的角度
+                    const newAngle = currentAngle + layer.rotationSpeed;
+                    
+                    // 计算新的位置
+                    const distance = Vector.magnitude(Vector.sub(polygon.position, { x: centerX, y: centerY }));
+                    const newX = centerX + distance * Math.cos(newAngle);
+                    const newY = centerY + distance * Math.sin(newAngle);
+                    
+                    // 更新位置和角度
+                    Body.setPosition(polygon, { x: newX, y: newY });
+                    Body.setAngle(polygon, polygon.angle + layer.rotationSpeed);
+                }
+            });
+            
+            // 检查小球是否在多边形外部
+            const bodies = Composite.allBodies(world);
+            bodies.forEach(body => {
+                if (body.circleRadius && !body.isRemoved) {
+                    const distance = Vector.magnitude(Vector.sub(body.position, { x: centerX, y: centerY }));
+                    
+                    // 如果小球超出最外层多边形，标记为已移除
+                    if (distance > polygonLayers[polygonLayers.length - 1].radius + 50) {
+                        body.isRemoved = true;
+                        body.render.opacity = 0.3; // 使小球变透明
+                    }
+                }
+            });
+        });
+
+        // 创建开口多边形函数（返回多个线段）
+        function createOpenPolygon(x, y, sides, radius, color, rotationSpeed, gapSize) {
+            const segments = [];
+            const angle = Math.PI * 2 / sides;
+            
+            // 为每个边创建一个线段，除了缺口处
+            for (let i = 0; i < sides; i++) {
+                // 计算当前边的起点和终点
+                const startAngle = angle * i;
+                const endAngle = angle * (i + gapSize);
+                
+                // 如果这个边跨度超过下一个顶点，则创建到下一个顶点的线段
+                if (gapSize >= 1) {
+                    const nextAngle = angle * (i + 1);
+                    
+                    const startX = x + radius * Math.cos(startAngle);
+                    const startY = y + radius * Math.sin(startAngle);
+                    const endX = x + radius * Math.cos(nextAngle);
+                    const endY = y + radius * Math.sin(nextAngle);
+                    
+                    // 创建线段
+                    const segment = Bodies.fromVertices(x, y, [[
+                        { x: startX, y: startY },
+                        { x: endX, y: endY },
+                        { x: x + (endX - x) * 0.9, y: y + (endY - y) * 0.9 },
+                        { x: x + (startX - x) * 0.9, y: y + (startY - y) * 0.9 }
+                    ]], {
+                        isStatic: true,
+                        render: {
+                            fillStyle: color,
+                            strokeStyle: '#000',
+                            lineWidth: 1
+                        },
+                        rotationSpeed: rotationSpeed,
+                        friction: 0.1,
+                        restitution: 0.8
+                    });
+                    
+                    segments.push(segment);
+                }
+            }
+            
+            // 创建缺口
+            const gapStartAngle = Common.random(0, Math.PI * 2);
+            const gapEndAngle = gapStartAngle + angle * (1 - gapSize);
+            
+            // 为每个非缺口部分创建线段
+            for (let i = 0; i < sides; i++) {
+                const segmentStartAngle = angle * i;
+                const segmentEndAngle = angle * (i + 1);
+                
+                // 检查这个线段是否与缺口重叠
+                const isGap = (segmentStartAngle >= gapStartAngle && segmentStartAngle <= gapEndAngle) ||
+                              (segmentEndAngle >= gapStartAngle && segmentEndAngle <= gapEndAngle) ||
+                              (gapStartAngle >= segmentStartAngle && gapStartAngle <= segmentEndAngle);
+                
+                if (!isGap) {
+                    const startX = x + radius * Math.cos(segmentStartAngle);
+                    const startY = y + radius * Math.sin(segmentStartAngle);
+                    const endX = x + radius * Math.cos(segmentEndAngle);
+                    const endY = y + radius * Math.sin(segmentEndAngle);
+                    
+                    // 创建厚度为10的线段
+                    const thickness = 10;
+                    const dx = endX - startX;
+                    const dy = endY - startY;
+                    const length = Math.sqrt(dx * dx + dy * dy);
+                    const angle = Math.atan2(dy, dx);
+                    
+                    const segment = Bodies.rectangle(
+                        (startX + endX) / 2,
+                        (startY + endY) / 2,
+                        length,
+                        thickness,
+                        {
+                            isStatic: true,
+                            angle: angle,
+                            render: {
+                                fillStyle: color,
+                                strokeStyle: '#000',
+                                lineWidth: 1
+                            },
+                            rotationSpeed: rotationSpeed,
+                            friction: 0.1,
+                            restitution: 0.8
+                        }
+                    );
+                    
+                    segments.push(segment);
+                }
+            }
+            
+            return segments;
+        }
+
+        // 创建小球函数
+        function createBall() {
+            const radius = Common.random(10, 15);
+            const ball = Bodies.circle(centerX, centerY, radius, {
+                restitution: 0.8, // 弹性
+                friction: 0.005,
+                density: 0.001,
+                render: {
+                    fillStyle: getRandomColor(),
+                    strokeStyle: '#000',
+                    lineWidth: 1
+                }
+            });
+            
+            // 给小球一个随机的初始速度
+            const force = {
+                x: Common.random(-0.005, 0.005),
+                y: Common.random(-0.005, 0.005)
+            };
+            Body.applyForce(ball, ball.position, force);
+            
+            Composite.add(world, ball);
+            return ball;
+        }
+
+        // 随机颜色函数
+        function getRandomColor() {
+            const letters = '0123456789ABCDEF';
+            let color = '#';
+            for (let i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        }
+
+        // 添加边界，防止小球飞出画布
+        const wallOptions = {
+            isStatic: true,
+            render: {
+                visible: false
+            }
+        };
+
+        const walls = [
+            Bodies.rectangle(width/2, 0, width, 10, wallOptions),      // 上边界
+            Bodies.rectangle(width/2, height, width, 10, wallOptions), // 下边界
+            Bodies.rectangle(0, height/2, 10, height, wallOptions),    // 左边界
+            Bodies.rectangle(width, height/2, 10, height, wallOptions) // 右边界
+        ];
+
+        Composite.add(world, walls);
+
+        // 运行引擎和渲染器
+        Render.run(render);
+        const runner = Runner.create();
+        Runner.run(runner, engine);
+
+        // 旋转多边形
+        Events.on(engine, 'beforeUpdate', function() {
+            // 为每层多边形创建一个旋转中心
+            const rotationCenters = polygonLayers.map((layer, index) => {
+                return {
+                    x: centerX,
+                    y: centerY,
+                    radius: layer.radius,
+                    rotationSpeed: layer.rotationSpeed
+                };
+            });
+            
+            // 旋转每个线段
+            polygons.forEach(polygon => {
+                // 找到这个线段属于哪个旋转中心
+                const distance = Vector.magnitude(Vector.sub(polygon.position, { x: centerX, y: centerY }));
+                const center = rotationCenters.find(c => Math.abs(c.radius - distance) < 30);
+                
+                if (center) {
+                    // 围绕中心点旋转
+                    Body.setAngularVelocity(polygon, center.rotationSpeed);
+                    Body.setAngle(polygon, polygon.angle + center.rotationSpeed);
+                    
+                    // 保持线段在圆周上
+                    const currentAngle = Math.atan2(
+                        polygon.position.y - centerY,
+                        polygon.position.x - centerX
+                    );
+                    const newAngle = currentAngle + center.rotationSpeed;
+                    const newX = centerX + center.radius * Math.cos(newAngle);
+                    const newY = centerY + center.radius * Math.sin(newAngle);
+                    
+                    Body.setPosition(polygon, { x: newX, y: newY });
+                }
+            });
+            
+            // 检查小球是否在多边形外部
+            const bodies = Composite.allBodies(world);
+            bodies.forEach(body => {
+                if (body.circleRadius && !body.isRemoved) {
+                    const distance = Vector.magnitude(Vector.sub(body.position, { x: centerX, y: centerY }));
+                    
+                    // 如果小球超出最外层多边形，标记为已移除
+                    if (distance > polygonLayers[0].radius + 50) {
+                        body.isRemoved = true;
+                        body.render.opacity = 0.3; // 使小球变透明
+                    }
+                }
+            });
+        });
+
+        // 添加按钮事件
+        document.getElementById('addBall').addEventListener('click', function() {
+            createBall();
+        });
+
+        document.getElementById('reset').addEventListener('click', function() {
+            // 移除所有小球
+            const bodies = Composite.allBodies(world);
+            bodies.forEach(body => {
+                if (body.circleRadius) {
+                    Composite.remove(world, body);
+                }
+            });
+        });
+
+        // 初始添加一些小球
+        for (let i = 0; i < 5; i++) {
+            createBall();
+        }
+
+        // 添加鼠标点击事件，在点击位置添加小球
+        canvas.addEventListener('click', function(event) {
+            const rect = canvas.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+            
+            // 检查点击位置是否在中心区域
+            const distance = Math.sqrt(Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2));
+            if (distance < polygonLayers[polygonLayers.length - 1].radius) {
+                const ball = Bodies.circle(x, y, Common.random(10, 15), {
+                    restitution: 0.8,
+                    friction: 0.005,
+                    density: 0.001,
+                    render: {
+                        fillStyle: getRandomColor(),
+                        strokeStyle: '#000',
+                        lineWidth: 1
+                    }
+                });
+                
+                Composite.add(world, ball);
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,13 +1,14 @@
 <!-- 具体的图片链接-->
 <template>
 	<div class="page-container">
+    <!-- 头部宣传区域 -->
 		<details-title
 			:title="box.title"
 			:date="box.create_date"
 			:character="box.character"
 			:type="box.type"
 		></details-title>
-		<!-- 头部宣传区域 -->
+		
 
 		<!-- 画集介绍区域 -->
 		<div class="introduction">
@@ -20,17 +21,7 @@
 			<div class="description" v-html="box.description">
 			</div>
 		</div>
-		<!--		&lt;!&ndash; 下载地址区域 &ndash;&gt;-->
-		<!--		<div class="download">-->
-		<!--			<h3>下载地址</h3>-->
-		<!--			<div class="download-content">-->
-		<!--				<div class="login-info">-->
-		<!--					<i class="icon-user"></i>-->
-		<!--					<p>您需要登录才能查看完整内容</p>-->
-		<!--				</div>-->
-		<!--				<button @click="handleLogin">立即登录</button>-->
-		<!--			</div>-->
-		<!--		</div>-->
+	
 		<!-- 图片区域 -->
 		<div class="image-list">
 			<h3>Image</h3>
@@ -50,13 +41,52 @@
 				</div>
 			</div>
 		</div>
+    
 		<!--	tags区域	-->
-		<div v-if="tags.length !== 0" class="tags">
+		<div class="tags">
 			<h3>Tags</h3>
 			<div class="tags-container">
-				<el-tag v-for="item in tags" size="large" type="info" >{{item}}</el-tag>
+				<el-tag v-for="item in tags" size="large" type="info" class="add-tag">{{item}}</el-tag>
+				<!-- 添加标签按钮 -->
+        <el-tag  @click="showAddTagDialog" size="large" type="info" class="add-tag"  ><el-icon><Plus /></el-icon></el-tag>
 			</div>
 		</div>
+
+		<!-- 添加标签对话框 -->
+		<el-dialog
+			v-model="tagDialogVisible"
+			title="添加标签"
+			width="30%"
+			:before-close="handleCloseTagDialog"
+
+		>
+			<el-form :model="tagForm">
+				<el-form-item label="标签">
+					<el-select
+						v-model="tagForm.selectedTags"
+						multiple
+						filterable
+						allow-create
+						default-first-option
+						placeholder="请输入或选择标签"
+						style="width: 100%"
+					>
+						<el-option
+							v-for="tag in availableTags"
+							:key="tag"
+							:label="tag"
+							:value="tag"
+						/>
+					</el-select>
+				</el-form-item>
+			</el-form>
+			<template #footer>
+				<span class="dialog-footer">
+					<el-button @click="tagDialogVisible = false">取消</el-button>
+					<el-button type="primary" @click="addTags">确认</el-button>
+				</span>
+			</template>
+		</el-dialog>
 
 		<!-- 更新记录区域 -->
 		<div class="update-history">
@@ -97,7 +127,8 @@
 import {computed, onMounted, ref} from 'vue';
 import DetailsTitle from "@/components/details/DetailsTitle.vue";
 import {baseUrl, imageUrl, localUrl, formatDate} from "@/utils/methods.js";
-
+import {Plus} from "@element-plus/icons-vue";
+import { ElMessage } from 'element-plus'; // 导入消息组件
 
 // Waline评论面板
 import {Waline} from '@waline/client/component';
@@ -152,6 +183,10 @@ const fetchUpdateRecords = async (id) => {
 		)
 		if (response.status === 200 && response.data.update_history) {
 			updateRecords.value = response.data.update_history;
+      // 按时间倒序排列更新记录
+      updateRecords.value.sort((a, b) => {
+          return new Date(a.updated_at) - new Date(b.updated_at);
+      });
 			// console.log(updateRecords.value);
 		}
 	} catch (error) {
@@ -203,6 +238,73 @@ onMounted(() => {
 	})
 })
 
+
+
+// 标签相关
+const tagDialogVisible = ref(false);
+const availableTags = ref([]); // 可用的标签列表
+const tagForm = ref({
+  selectedTags: []
+});
+
+// 显示添加标签对话框
+const showAddTagDialog = () => {
+  // 如果用户未登录，提示登录
+  if (!localStorage.getItem('access_token')) {
+    ElMessage.warning('请先登录后再添加标签');
+    return;
+  }
+  tagDialogVisible.value = true;
+  // 这里可以加载可用的标签列表，如果有API的话
+  // loadAvailableTags();
+};
+
+// 关闭对话框
+const handleCloseTagDialog = () => {
+  tagDialogVisible.value = false;
+  tagForm.value.selectedTags = [];
+};
+
+// 添加标签
+const addTags = async () => {
+  if (tagForm.value.selectedTags.length === 0) {
+    ElMessage.warning('请至少选择一个标签');
+    return;
+  }
+  
+  try {
+    // const token = localStorage.getItem('token');
+    const response = await requests.post(
+      `${localUrl}/tags/images/${props.id}/tags`,
+      { tag_names: tagForm.value.selectedTags },
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('access_token')}`
+        }
+      }
+    );
+    
+    if (response.status === 200) {
+      ElMessage.success('标签添加成功');
+      // 刷新标签列表
+      const tagsResponse = await requests.get(
+        `${localUrl}/tags/images/${props.id}/tags`
+      );
+      if (tagsResponse.status === 200) {
+        tags.value = tagsResponse.data.tags;
+      }
+      // 刷新更新记录
+      fetchUpdateRecords(props.id);
+      // 关闭对话框
+      tagDialogVisible.value = false;
+      tagForm.value.selectedTags = [];
+    }
+  } catch (error) {
+    console.error('添加标签失败:', error);
+    ElMessage.error('添加标签失败，请稍后重试');
+  }
+};
+//  标签相关结束
 </script>
 
 <style scoped lang="scss">
@@ -434,7 +536,7 @@ onMounted(() => {
 
   .introduction {
     margin-top: 20px;
-    background-color: #f0f8ff;
+    // background-color: #f0f8ff;
     border-radius: 10px;
     padding: 12px 20px;
 
@@ -455,7 +557,7 @@ onMounted(() => {
 
   .image-list {
     margin-top: 20px;
-    background-color: #f0f8ff;
+    // background-color: #f0f8ff;
     border-radius: 10px;
     padding: 12px 20px;
     box-sizing: border-box;
@@ -496,7 +598,7 @@ onMounted(() => {
 
   .download {
     margin-top: 20px;
-    background-color: #f0f8ff;
+    // background-color: #f0f8ff;
     border-radius: 10px;
     padding: 20px;
 
@@ -542,5 +644,12 @@ onMounted(() => {
   margin-left: -0.5em;
   margin-right: -0.5em;
   margin-top: 20px;
+}
+.add-tag{
+  &:hover{
+    cursor: pointer;
+    background-color: #66BABC;
+    transition: all .3s ease-in-out;
+  }
 }
 </style>

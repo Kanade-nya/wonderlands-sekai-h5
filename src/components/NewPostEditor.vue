@@ -1,4 +1,4 @@
-<!-- wonderlands-sekai-h5/src/components/NewPostEditor.vue -->
+<!-- wonderlands-sekai-h5/src/Unit/NewPostEditor.vue -->
 <template>
 	<div class="new-post-editor">
 		<el-form :model="formData" label-width="80px">

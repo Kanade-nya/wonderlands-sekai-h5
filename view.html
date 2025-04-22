@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clickable Circle with Ripple and New Circles</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f4f8;
+        }
+
+        canvas {
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            background-color: #ffffff;
+        }
+    </style>
+</head>
+
+<body>
+<canvas id="myCanvas" width="800" height="600"></canvas>
+<script>
+    const canvas = document.getElementById('myCanvas');
+    const ctx = canvas.getContext('2d');
+
+    const mainCircle = {
+        x: canvas.width / 2,
+        y: canvas.height / 2,
+        radius: 50,
+        color: '#3b82f6'
+    };
+
+    const ripples = [{
+        x: mainCircle.x,
+        y: mainCircle.y,
+        radius: mainCircle.radius,
+        opacity: 1
+    }];
+
+    const mediumCircles = [];
+    const smallCircles = [];
+
+    function drawMainCircle() {
+        ctx.beginPath();
+        ctx.arc(mainCircle.x, mainCircle.y, mainCircle.radius, 0, Math.PI * 2);
+        ctx.fillStyle = mainCircle.color;
+        ctx.shadowColor = 'rgba(59, 130, 246, 0.5)';
+        ctx.shadowBlur = 10;
+        ctx.fill();
+        ctx.shadowBlur = 0;
+        ctx.closePath();
+    }
+
+    function isPointInsideCircle(x, y, circle) {
+        const dx = x - circle.x;
+        const dy = y - circle.y;
+        return dx * dx + dy * dy <= circle.radius * circle.radius;
+    }
+
+    function drawRipples() {
+        for (let i = ripples.length - 1; i >= 0; i--) {
+            const ripple = ripples[i];
+            ctx.beginPath();
+            ctx.arc(ripple.x, ripple.y, ripple.radius, 0, Math.PI * 2);
+            ctx.strokeStyle = `rgba(59, 130, 246, ${ripple.opacity})`;
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            ctx.closePath();
+
+            ripple.radius += 1;
+            ripple.opacity -= 0.01;
+
+            if (ripple.opacity <= 0) {
+                ripple.radius = mainCircle.radius;
+                ripple.opacity = 1;
+            }
+        }
+    }
+
+    function isOverlapping(circle1, circle2) {
+        const dx = circle1.x - circle2.x;
+        const dy = circle1.y - circle2.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        return distance < circle1.radius + circle2.radius;
+    }
+
+    function drawCircles(circles) {
+        for (const circle of circles) {
+            ctx.beginPath();
+            ctx.arc(circle.x, circle.y, circle.currentRadius, 0, Math.PI * 2);
+            ctx.fillStyle = circle.color;
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.2)';
+            ctx.shadowBlur = 5;
+            ctx.fill();
+            ctx.shadowBlur = 0;
+            ctx.closePath();
+
+            if (circle.parent) {
+                const dx = circle.x - circle.parent.x;
+                const dy = circle.y - circle.parent.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                const startX = circle.parent.x + (dx / distance) * circle.parent.radius;
+                const startY = circle.parent.y + (dy / distance) * circle.parent.radius;
+                const endX = circle.x - (dx / distance) * circle.currentRadius;
+                const endY = circle.y - (dy / distance) * circle.currentRadius;
+
+                ctx.beginPath();
+                ctx.moveTo(startX, startY);
+                ctx.lineTo(endX, endY);
+                ctx.strokeStyle = '#cbd5e1';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+            }
+
+            if (circle.currentRadius < circle.radius) {
+                circle.currentRadius += 1;
+            }
+        }
+    }
+
+    function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawMainCircle();
+        drawRipples();
+        drawCircles(mediumCircles);
+        drawCircles(smallCircles);
+        requestAnimationFrame(animate);
+    }
+
+    canvas.addEventListener('mousemove', function (event) {
+        const rect = canvas.getBoundingClientRect();
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
+
+        if (isPointInsideCircle(x, y, mainCircle)) {
+            canvas.style.cursor = 'pointer';
+        } else {
+            let isOverMedium = false;
+            for (const circle of mediumCircles) {
+                if (isPointInsideCircle(x, y, circle)) {
+                    isOverMedium = true;
+                    break;
+                }
+            }
+            canvas.style.cursor = isOverMedium ? 'pointer' : 'default';
+        }
+    });
+
+    canvas.addEventListener('click', function (event) {
+        const rect = canvas.getBoundingClientRect();
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
+
+        if (isPointInsideCircle(x, y, mainCircle)) {
+            mediumCircles.length = 0;
+            smallCircles.length = 0;
+            const colors = ['#ef4444', '#22c55e', '#f59e0b', '#8b5cf6'];
+            const minDistance = mainCircle.radius + 100;
+            const maxDistance = mainCircle.radius + 200;
+            const maxAttempts = 100;
+
+            for (let i = 0; i < 4; i++) {
+                let newCircle;
+                let attempts = 0;
+                do {
+                    const distance = Math.random() * (maxDistance - minDistance) + minDistance;
+                    const angle = Math.random() * 2 * Math.PI;
+                    const newX = mainCircle.x + distance * Math.cos(angle);
+                    const newY = mainCircle.y + distance * Math.sin(angle);
+                    newCircle = {
+                        x: newX,
+                        y: newY,
+                        radius: 20,
+                        color: colors[i],
+                        currentRadius: 0,
+                        parent: mainCircle
+                    };
+                    attempts++;
+                } while (
+                    mediumCircles.some(circle => isOverlapping(circle, newCircle)) &&
+                    attempts < maxAttempts
+                    );
+                if (attempts < maxAttempts) {
+                    mediumCircles.push(newCircle);
+                }
+            }
+        } else {
+            for (const mediumCircle of mediumCircles) {
+                if (isPointInsideCircle(x, y, mediumCircle)) {
+                    const smallColors = ['#ff6b6b', '#6be675', '#f7d794', '#a55eea'];
+                    const smallMinDistance = mediumCircle.radius + 50;
+                    const smallMaxDistance = mediumCircle.radius + 100;
+                    const smallMaxAttempts = 100;
+
+                    const existingSmallCircles = smallCircles.filter(circle => circle.parent === mediumCircle);
+                    existingSmallCircles.length = 0;
+
+                    for (let i = 0; i < 4; i++) {
+                        let newSmallCircle;
+                        let attempts = 0;
+                        do {
+                            const distance = Math.random() * (smallMaxDistance - smallMinDistance) + smallMinDistance;
+                            const angle = Math.random() * 2 * Math.PI;
+                            const newX = mediumCircle.x + distance * Math.cos(angle);
+                            const newY = mediumCircle.y + distance * Math.sin(angle);
+                            newSmallCircle = {
+                                x: newX,
+                                y: newY,
+                                radius: 10,
+                                color: smallColors[i],
+                                currentRadius: 0,
+                                parent: mediumCircle
+                            };
+                            attempts++;
+                        } while (
+                            smallCircles.some(circle => circle.parent === mediumCircle && isOverlapping(circle, newSmallCircle)) &&
+                            attempts < smallMaxAttempts
+                            );
+                        if (attempts < smallMaxAttempts) {
+                            smallCircles.push(newSmallCircle);
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+    });
+
+    animate();
+</script>
+</body>
+
+</html>

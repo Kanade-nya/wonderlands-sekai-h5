@@ -34,6 +34,7 @@
     "marked-highlight": "^2.2.1",
     "mockjs": "^1.1.0",
     "pinia": "^2.3.0",
+    "pinia-plugin-persistedstate": "^4.2.0",
     "prismjs": "^1.29.0",
     "undraw-ui": "^1.2.6",
     "valine": "^1.5.3",

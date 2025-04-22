@@ -1,4 +1,4 @@
-<!-- src/components/GridItem.vue -->
+<!-- src/Unit/GridItem.vue -->
 <template>
 	<view class="grid-item" @click="handleClick">
 		<uni-icons :type="iconType" size="24" color="#999"></uni-icons>

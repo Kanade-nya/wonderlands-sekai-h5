@@ -7,6 +7,7 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    AprilFoolActivity: typeof import('./src/components/aprilfool/AprilFoolActivity.vue')['default']
     BoxComponent: typeof import('./src/components/home/BoxComponent.vue')['default']
     BoxContent: typeof import('./src/components/home/BoxContent.vue')['default']
     CollectionBox: typeof import('./src/components/collection/CollectionBox.vue')['default']

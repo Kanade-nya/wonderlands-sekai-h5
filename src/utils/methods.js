@@ -2,8 +2,8 @@
 export const baseUrl = 'https://wonderlands-sekai.space'
 export const imageUrl = 'https://img.wonderlands-sekai.space'
 // export  const baseUrl = 'http://192.168.3.194:5000'
-// export const localUrl = 'http://127.0.0.1:8000'
-export const localUrl = 'https://wonderlands-sekai.space/api3'
+export const localUrl = 'http://127.0.0.1:8000'
+// export const localUrl = 'https://wonderlands-sekai.space/api3'
 export const ACCOUNT_ID = '7a0c96ad44cdb5138ab8b11a11658303'
 export const treeToList = (tree) => {
     let list = []

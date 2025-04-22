@@ -5,6 +5,7 @@ import {ArrowLeft} from "@element-plus/icons-vue";
 import UserProfileAvatar from "@/pages/User/Profile/UserProfileAvatar.vue";
 import UserProfileMeta from "@/pages/User/Profile/UserProfileMeta.vue";
 import {useRouter} from "vue-router";
+import UserSubmitData from "@/pages/User/Profile/UserSubmitData.vue";
 
 const router = useRouter()
 
@@ -26,7 +27,8 @@ const handleClick = () => {
 				<el-tab-pane label="基本资料" name="first"><user-profile-main></user-profile-main></el-tab-pane>
 				<el-tab-pane label="头像管理" name="second"><user-profile-avatar></user-profile-avatar></el-tab-pane>
 				<el-tab-pane label="标签" name="third"><user-profile-meta></user-profile-meta></el-tab-pane>
-				<el-tab-pane label="Task" name="fourth">Task</el-tab-pane>
+				<el-tab-pane label="提交数据" name="fourth"><user-submit-data></user-submit-data></el-tab-pane>
+				<el-tab-pane label="Task" name="fifth">Task</el-tab-pane>
 			</el-tabs>
 		</el-card>
 	</div>

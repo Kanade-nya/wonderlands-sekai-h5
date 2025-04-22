@@ -1,11 +1,11 @@
-<!-- src/components/Banner.vue -->
+<!-- src/Unit/Banner.vue -->
 <script setup>
 import {ref, defineProps,onUnmounted,computed} from 'vue';
 import {ArrowDown, Back, Operation, UserFilled} from "@element-plus/icons-vue";
-// import GridRow from "@/components/grid/GridRow.vue";
+// import GridRow from "@/Unit/grid/GridRow.vue";
 import VerticalMenu from "@/components/grid/VerticalMenu.vue";
 // import uniIcons from "@dcloudio/uni-ui/lib/uni-icons/uni-icons.vue";
-// import GridRow from "@/components/useful/GridRow.vue";
+// import GridRow from "@/Unit/useful/GridRow.vue";
 // import {goBack} from "@/utils/usual";
 // import GridRow from "./grid/GridRow.vue";
 import {useRouter} from "vue-router";
@@ -14,6 +14,19 @@ import SearchInput from "@/components/common/SearchInput.vue";
 import PhonePanel from "@/components/common/PhonePanel.vue";
 import {useUserInfoStore} from "@/stores/useUserInfoStore.js";
 import UserMenuPanel from "@/components/common/UserMenuPanel.vue";
+
+
+// 获取用户加载信息
+import { useUserData } from "@/stores/useUserData.js";
+const userData = useUserData();
+// 头像相关功能，获取用户头像，否则使用默认地址
+// 默认头像地址
+const defaultAvatar = 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png';
+// 获取用户头像
+const currentAvatar = computed(() => {
+	return userData.getUserData().avatar || defaultAvatar;
+})
+
 
 const userInfoStore = useUserInfoStore();
 
@@ -181,9 +194,12 @@ const forceHideUserMenu = () => {
 };
 
 const onAvatarClick = () => {
-	if (userInfoStore.getUserInfo.userName !== '') {
-		isUserMenuVisible.value = !isUserMenuVisible.value;
-	} else {
+	// if (userInfoStore.getUserInfo.userName !== '') {
+	// 	isUserMenuVisible.value = !isUserMenuVisible.value;
+	// } 
+	if (userData.isLogin()){
+		router.push('/user/center/main');
+	}else {
 		router.push('/user/login');
 	}
 }
@@ -193,12 +209,12 @@ onUnmounted(() => {
 	clearTimeout(hoverTimer);
 });
 
-// 默认头像地址
-const defaultAvatar = 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png';
-// 使用计算属性获取用户头像，如果未登录或没有头像则使用默认头像
-const userAvatar = computed(() => {
-  return userInfoStore.getUserInfo.userAvatar || defaultAvatar;
-});
+// // 默认头像地址
+// const defaultAvatar = 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png';
+// // 使用计算属性获取用户头像，如果未登录或没有头像则使用默认头像
+// const userAvatar = computed(() => {
+//   return userInfoStore.getUserInfo.userAvatar || defaultAvatar;
+// });
 
 
 
@@ -307,12 +323,15 @@ const userAvatar = computed(() => {
 				></search-input>
 			</div>
 
-			<div
+			<!-- <div
 				class="avatar-div"
 				@mouseenter="showUserMenu"
-				@mouseleave="hideUserMenu"
+				@mouseleave="hideUserMenu" // 不用移入移出的用户面板了
+			> -->
+			<div
+				class="avatar-div"
 			>
-				<el-avatar :size="30" :src="userAvatar" @click="onAvatarClick"></el-avatar>
+				<el-avatar :size="30" :src="currentAvatar" @click="onAvatarClick"></el-avatar>
 				<transition
 					name="fade"
 					class="user-panel"

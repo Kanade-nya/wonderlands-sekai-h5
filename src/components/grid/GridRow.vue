@@ -1,4 +1,4 @@
-<!-- src/components/useful/GridRow.vue -->
+<!-- src/Unit/useful/GridRow.vue -->
 <!--水平的小点击按钮栏-->
 <template>
 	<div class="grid-row">

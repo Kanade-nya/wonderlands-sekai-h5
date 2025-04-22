@@ -3,13 +3,62 @@ import { createRouter, createWebHistory, createWebHashHistory } from 'vue-router
 // ... 其他导入保持不变 ...
 import { ElLoading } from 'element-plus';
 import MercariList from '@/pages/Test/MercariList.vue';
+import AprilFoolActivity from '@/components/aprilfool/AprilFoolActivity.vue';
+import path from 'path';
 
 const routes = [
+    {
+        path: '/middle',
+        name: 'middle',
+        component: () => import('@/pages/Test/middletest.vue'),
+    },
+    {
+        path: '/user/center',
+        name: 'userCenter',
+        children: [
+            {
+                path: 'main',
+                name: 'userCenterMain',
+                component: () => import('@/pages/UserCenter/UserCenterContainer.vue'),
+            },
+            {
+                path: 'upload/data',
+                name: 'userCenterUploadData',
+                component: () => import('@/pages/Common/UploadMainData.vue')
+            }
+        ]
+
+    },
+    {
+        path: '/panel/:id',
+        name: 'Panel',
+        component: () => import('@/pages/UserPanel/UserPanelMain.vue'),
+        meta: {
+            title: '用户主页',
+            requiresAuth: false
+        }
+    },
+    {
+        path: '/goods',
+        component: () => import('@/pages/Goods/index.vue')
+    },
+    {
+        path: '/goods/:id',
+        component: () => import('@/pages/Goods/components/GoodsDetail.vue')
+    },
+    {
+        path: '/april-fool',
+        name: 'AprilFoolActivity',
+        component: AprilFoolActivity,
+        meta: {
+            title: '愚人节快乐'
+        }
+    },
     {
         path: '/mercari',
         name: 'MercariList',
         component: MercariList
-      },
+    },
     {
         path: '/pages/:page_id',
         name: 'pages',
@@ -149,6 +198,15 @@ const routes = [
                 name: 'userProfile',
                 component: () => import('@/pages/User/Profile/UserProfileContainer.vue'),
             },
+            // 添加新的路由配置
+            {
+                path: 'profile/submit',
+                name: 'UserSubmitData',
+                component: () => import('@/pages/User/Profile/UserSubmitData.vue'),
+                meta: {
+                    requiresAuth: true
+                }
+            },
             {
                 path: 'post-record',
                 name: 'userPostRecord',
@@ -236,4 +294,6 @@ router.afterEach((to, from, next) => {
 });
 
 export default router;
+
+
 

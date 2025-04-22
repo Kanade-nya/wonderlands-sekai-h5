@@ -1,0 +1,35 @@
+$primary-color: #409eff;
+$price-color: #f56c6c;
+$tag-bg: #f0f2f5;
+
+.tag {
+  background-color: $tag-bg;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.btn {
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn-primary {
+  background-color: $primary-color;
+  color: white;
+}
+
+.text-price-color {
+  color: $price-color;
+}
+
+.goods-card {
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: transform 0.3s ease;
+
+  &:hover {
+    transform: translateY(-5px);
+  }
+}

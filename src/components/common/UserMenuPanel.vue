@@ -1,8 +1,13 @@
-<!-- src/components/common/UserMenuPanel.vue -->
+<!-- src/Unit/common/UserMenuPanel.vue -->
+<!-- 这里是导航栏的用户界面，去检测是否登录来着 -->
 <script setup>
 import { useUserInfoStore } from "@/stores/useUserInfoStore.js";
 import { useRouter,useRoute } from "vue-router";
 import { ref, defineProps, defineEmits, watch, computed, onMounted, onActivated } from 'vue';
+// 加载用户数据表
+import { useUserData } from "@/stores/useUserData.js";
+
+const userData = useUserData();
 const props = defineProps({
 	visible: {
 		type: Boolean,
@@ -21,12 +26,16 @@ const isLoading = ref(true);
 const defaultAvatar = 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png';
 // 使用计算属性获取用户头像，如果未登录或没有头像则使用默认头像
 const userAvatar = computed(() => {
-	return userInfoStore.getUserInfo.userAvatar || defaultAvatar;
+	return userData.getUserData().avatar || defaultAvatar;
 });
 
 // 判断用户是否登录
 const isLoggedIn = computed(() => {
-	return userInfoStore.getUserInfo.isLogin;
+	if (userData.getUserData().isLogin === 1){
+		return true;
+	}else {
+		return false;
+	}
 });
 
 // 检查用户登录状态
@@ -34,11 +43,12 @@ const checkLoginStatus = () => {
 	console.log('检测token');
 	
 	const token = localStorage.getItem('access_token');
-	console.log(userInfoStore.getUserInfo);
+	console.log('↓ 检测用户登录状态之后的userData信息');
+	console.log(userData.getUserData());
 	
-	if (token && !userInfoStore.getUserInfo.isLogin) {
+	if (token && userData.getUserData().isLogin !== 1) {
 		// 如果有token但store中显示未登录，尝试重新获取用户信息
-		userInfoStore.triggerRevalidation();
+		// userInfoStore.triggerRevalidation();
 	}
 };
 
@@ -99,8 +109,8 @@ const goToLogin = () => {
 		<div class="panel-header">
 			<el-avatar :size="50" :src="userAvatar" class="panel-avatar"></el-avatar>
 			<div class="user-info">
-				<div class="username">{{ userInfoStore.getUserInfo.userName || '未登录' }}</div>
-				<div class="user-level" v-if="isLoggedIn">LV{{ userInfoStore.getUserInfo.userLevel || 1 }}</div>
+				<div class="username">{{ userData.getUserData().username || '未登录' }}</div>
+				<div class="user-level" v-if="isLoggedIn">LV{{  1 }}</div>
 			</div>
 		</div>
 

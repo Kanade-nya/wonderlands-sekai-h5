@@ -59,7 +59,9 @@ import { useRouter } from "vue-router";
 import axios from "axios";
 import { useUserInfoStore } from "@/stores/useUserInfoStore.js";
 import { localUrl } from "@/utils/methods.js";
-import {validateUserToken} from '@/utils/user.js'
+import { validateUserToken } from '@/utils/user.js'
+import { useUserData } from "@/stores/useUserData.js";
+const userData = useUserData()
 const router = useRouter()
 
 const handleForget = () => {
@@ -129,6 +131,21 @@ const handleLogin = async () => {
 				ElMessage.success('登录成功')
 				// 存储token
 				localStorage.setItem('access_token', response.data.access_token)
+				// 获取通过保护路由用户的基本数据
+				await axios.get(`${localUrl}/user/protected`, {
+					headers: {
+						Authorization: `Bearer ${response.data.access_token}`
+					}
+				}).then(response => {
+					// console.log(response)
+					// 需要isLogin === 1 让navbar在点击头像的时候跳转到用户中心
+					if (response.status === 200) {
+						userData.setUserData({
+							isLogin: 1,
+							...response.data.user_info,
+						})
+					}
+				})
 
 				// 导入并使用 userInfoStore
 				const userInfoStore = useUserInfoStore();
@@ -136,6 +153,7 @@ const handleLogin = async () => {
 				userInfoStore.triggerRevalidation();
 
 				await validateUserToken()
+
 
 				// 这里可以添加路由跳转
 				// router.push('/')

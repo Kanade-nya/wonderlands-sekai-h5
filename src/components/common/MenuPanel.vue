@@ -1,4 +1,4 @@
-<!-- src/components/MenuPanel.vue -->
+<!-- src/Unit/MenuPanel.vue -->
 <template>
 	<div class="menu-panel" v-if="isVisible">
 		<div class="menu-item" @click="selectOption('2DMV')">2DMV</div>
