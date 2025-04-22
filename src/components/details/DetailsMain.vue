@@ -24,7 +24,7 @@
 	
 		<!-- 图片区域 -->
 		<div class="image-list">
-			<h3>Image</h3>
+			<h3 style="margin-bottom: 16px;">Image</h3>
 			<div class="image-list-container">
 				<!--				<img src="@/assets/img_1.png" class="listed-image">-->
 				<!--				<img src="@/assets/e0a9ce33a7fef53e5557e9bc2b9dafbe3546749308242173.jpg" class="listed-image">-->
@@ -334,7 +334,7 @@ const addTags = async () => {
     
     .image-list {
       padding: 10px;
-      margin-top: 15px;
+      // margin-top: 15px;
       
       & > h3 {
         font-size: 18px;
@@ -400,6 +400,8 @@ const addTags = async () => {
     
     .comments {
       margin-top: 15px;
+      padding-left: 20px;
+      padding-right: 20px;
     }
   }
 }
@@ -456,14 +458,14 @@ const addTags = async () => {
 
     margin-top: 20px;
     padding: 12px 20px;
-    background-color: rgba(240, 248, 255, 0.3);
+    // background-color: rgba(240, 248, 255, 0.3);
     border-radius: 10px;
   }
 
   .update-history {
     margin-top: 20px;
     padding: 12px 20px;
-    background-color: rgba(240, 248, 255, 0.3);
+    // background-color: rgba(240, 248, 255, 0.3);
     border-radius: 10px;
     
     h3 {
@@ -556,7 +558,7 @@ const addTags = async () => {
   }
 
   .image-list {
-    margin-top: 20px;
+    // margin-top: 20px;
     // background-color: #f0f8ff;
     border-radius: 10px;
     padding: 12px 20px;
@@ -651,5 +653,8 @@ const addTags = async () => {
     background-color: #66BABC;
     transition: all .3s ease-in-out;
   }
+}
+.tags-container{
+  margin-top: 8px;	
 }
 </style>
