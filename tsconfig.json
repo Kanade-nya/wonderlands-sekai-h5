@@ -1,39 +1,24 @@
 {
-  "files": [],
-  "references": [
-    {
-      "path": "./tsconfig.app.json",
-      "composite": true
-    },
-    {
-      "path": "./tsconfig.node.json",
-      "composite": true
-    }
-  ],
   "compilerOptions": {
-    "baseUrl": "./",
-    "paths": {
-      "@/*": [
-        "./src/*"
-      ]
-    },
-    "module": "esnext",
-    "target": "esnext",
+    "outDir": "./dist",      // 指定编译输出目录
+    "rootDir": "./src",      // 指定源码目录
+    "allowJs": true,         // 允许编译js文件
+    "checkJs": false,        // 不检查js类型
+    "target": "ESNext",
+    "module": "ESNext",
+    "strict": true,
+    "jsx": "preserve",
     "moduleResolution": "node",
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "sourceMap": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    },
+    "lib": ["ESNext", "DOM"],
+    "types": ["vite/client"]
   },
-  "include": [
-    "src/**/*.ts",
-    "src/**/*.tsx",
-    "src/**/*.vue",
-    "tests/**/*.ts",
-    "tests/**/*.tsx",
-    "typings",
-    "src/.env"
-  ]
-
-//  "include": [
-//    "src/**/*.ts",
-//    "src/**/*.tsx",
-//    "src/**/*.vue"
-//  ]
+  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue"]
 }

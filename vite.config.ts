@@ -20,6 +20,7 @@ export default defineConfig({
         },
     },
     build: {
+        // sourcemap: true,
         minify: 'terser',
         terserOptions: {
             compress: {
@@ -28,16 +29,19 @@ export default defineConfig({
             }
         },
         // 拆分代码块
-        rollupOptions: {
-            output: {
-                manualChunks: {
-                    // 将第三方库拆分成独立的chunk
-                    'element-plus': ['element-plus'],
-                    'vue-vendor': ['vue', 'vue-router', 'pinia'],
-                    'editor': ['@wangeditor/editor', '@wangeditor/editor-for-vue']
-                }
-            }
-        },
+        // rollupOptions: {
+        //     output: {
+        //         manualChunks: {
+        //             // 将第三方库拆分成独立的chunk
+        //             'element-plus': ['element-plus'],
+        //             'vue-vendor': ['vue', 'vue-router', 'pinia'],
+        //             'editor': ['@wangeditor/editor', '@wangeditor/editor-for-vue']
+        //         }
+        //     }
+        // },
+        // commonjsOptions:{
+        //     requireReturnsDefault: 'namespace'
+        // }
     },
     base: './',
     plugins: [
@@ -74,7 +78,7 @@ export default defineConfig({
     server: {
         host: '0.0.0.0',
         port: 8080,
-        open: true,
+        open: 'http://192.168.3.194:8080',
         proxy: {
             '/api2': {
                 target: 'https://wonderlands-sekai.space/api2',

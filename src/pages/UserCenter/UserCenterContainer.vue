@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
 
 import UserCenterHeaderVue from './Components/UserCenterHeader.vue';
 import UserCenterTabsVue from './Components/UserCenterTabs.vue';

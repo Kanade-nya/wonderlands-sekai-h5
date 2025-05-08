@@ -1,5 +1,5 @@
 <!-- 这里的功能是用户上传主页的插画信息,从UserCenter分离以复用 -->
-<script setup lang="ts">
+<script setup>
 import { ref, onMounted } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import PostImage from "@/components/post_information/PostImage.vue";
@@ -10,7 +10,7 @@ import CryptoJS from 'crypto-js';
 import axios from "axios";
 import router from "@/router/router.js";
 import { apiConfig } from "@/config/Config.js";
-
+import { localUrl } from "@/utils/methods.js";
 import {
     S3Client,
     PutObjectCommand,
@@ -234,46 +234,61 @@ const handleSubmit = async () => {
     }
 
     const response = await axios.post(
-        `${baseUrl}/api2/website_image/add`,
+        `${localUrl}/user-center/upload-pending-image`,
+
         {
-            data: {
-                title: formData.value.title,
-                image_url: formData.value.image_url,
-                image_type_id: formData.value.type,
-                character_id: formData.value.character,
-                description: formData.value.description,
-                illustrator: formData.value.artiest
-            },
-            token: localStorage.getItem('token2')
+
+            title: formData.value.title,
+            image_url: formData.value.image_url,
+            type_id: formData.value.type,
+            character_id: formData.value.character,
+            description: formData.value.description,
+            artiest: formData.value.artiest,
+
+            token: localStorage.getItem('access_token')
+        },
+        {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+            }
         }
     );
 
     if (response.status === 200) {
-        ElMessageBox.alert('上传成功，感谢提交', 'success', {
-            confirmButtonText: 'OK',
-            callback: (action) => {
-                ElMessage({
-                    type: 'success',
-                    message: `上传成功`,
-                });
-                router.replace({ path: '/' });
-            },
+        // ElMessageBox.alert('上传成功，感谢提交', {
+        //     title: '成功',
+        //     type: 'success',
+        //     confirmButtonText: '确定',
+        //     center: true,
+        //     callback: (action) => {
+
+        //         router.replace({ path: '/' });
+        //     }
+        // });
+        ElMessage({
+            type: 'success',
+            message: '上传成功，等待审核'
         });
+        router.replace({ path: '/' });
     } else {
-        ElMessageBox.alert('图片上传失败，请重试', 'Error', {
-            confirmButtonText: 'OK',
+        ElMessageBox.alert('图片上传失败，请重试', {
+            title: '错误',
+            type: 'error',
+            confirmButtonText: '确定',
+            center: true,
             callback: (action) => {
                 ElMessage({
-                    type: 'info',
-                    message: '上传失败',
+                    type: 'error',
+                    message: '上传失败'
                 });
-            },
+            }
         });
     }
 };
 </script>
 
 <template>
+<div class="new-publication">
     <div class="upload-main-data">
         <div class="upload-container">
             <el-card class="box-card">
@@ -325,9 +340,14 @@ const handleSubmit = async () => {
             </el-card>
         </div>
     </div>
+</div>
 </template>
 
 <style lang="scss" scoped>
+.new-publication {
+    padding: 10px 0;
+
+}
 .upload-main-data {
     min-height: calc(100vh - 58px);
 

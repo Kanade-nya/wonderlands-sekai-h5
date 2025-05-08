@@ -1,11 +1,19 @@
 <!-- UserCenter 的最上面的栏目 -->
-<script setup lang="ts">
+<script setup>
 import { ref, onMounted } from 'vue';
-import {  Calendar, Link } from '@element-plus/icons-vue';
+import { Calendar, Link } from '@element-plus/icons-vue';
+// 调用userData数据
+import { useUserData } from "@/stores/useUserData.js";
+const userData = useUserData();
+// 路由跳转
+import { useRouter } from 'vue-router';
+const router = useRouter();
+//
+import HeaderUploadAvatar from "./HeaderUploadAvatar.vue";
 
 const defaultAvatar = '/public/images/default-avatar.png'
 const isCurrentUser = ref(true)
-const userInfo = ref<any>({
+const userInfo = ref({
     avatar: '',
     username: '',
     userDescription: '',
@@ -22,15 +30,28 @@ const handleChangeAvatar = () => {
     console.log('change avatar')
 }
 
-const formatJoinDate = (date: string) => {
+const formatJoinDate = (date) => {
     if (!date) return '未知时间';
     return new Date(date).toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' });
 }
 
-const formatUrl = (url: string) => {
+const formatUrl = (url) => {
     if (!url) return '';
     return url.startsWith('http') ? url : `https://${url}`;
 }
+
+const handleLogout = () => {
+    // 这里添加登出逻辑
+    userData.clearUserData(); // 假设userData store中有clearUserData方法
+    localStorage.removeItem('access_token'); // 清除token
+    // 可能需要重定向到登录页面
+    router.replace('/');
+}
+
+onMounted(() => {
+    userInfo.value = userData.getUserData();
+    // 检查是否是Admin
+})
 </script>
 
 <template>
@@ -41,13 +62,14 @@ const formatUrl = (url: string) => {
                 <!-- <el-icon>
                     <EditPen />
                 </el-icon> -->
-                <el-button size="small">上传头像</el-button>
+                <!-- <el-button size="small">上传头像</el-button> -->
+                 <HeaderUploadAvatar></HeaderUploadAvatar>
             </div>
         </div>
         <div class="user-info-container">
             <h1 class="user-name">{{ userInfo.username || '未设置昵称' }}</h1>
             <div class="user-id">@{{ userInfo.username || 'username' }}</div>
-            <div class="user-bio">{{ userInfo.userDescription || '这个人很懒，什么都没有留下...' }}</div>
+            <div class="user-bio">{{ userInfo.description || '这个人很懒，什么都没有留下...' }}</div>
             <div class="user-meta">
                 <div class="meta-item">
                     <el-icon>
@@ -64,10 +86,15 @@ const formatUrl = (url: string) => {
                     </a>
                 </div>
             </div>
-            <div class="user-tags" v-if="userTags && userTags.length > 0">
+            <!-- <div class="user-tags" v-if="userTags && userTags.length > 0">
                 <el-tag v-for="tag in userTags" :key="tag.content" :color="tag.color" effect="plain" class="user-tag">
                     {{ tag.content }}
                 </el-tag>
+            </div> -->
+            
+            <!-- 添加登出按钮 -->
+            <div class="logout-container" v-if="isCurrentUser">
+                <el-button type="danger" @click="handleLogout">退出登录</el-button>
             </div>
         </div>
     </div>

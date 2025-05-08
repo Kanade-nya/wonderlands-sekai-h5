@@ -18,7 +18,7 @@ import { useUserData } from "@/stores/useUserData.js";
 const userData = useUserData();
 
 import axios from "axios";
-import { ElMessage } from "element-plus";
+import {ElMessage, ElNotification} from "element-plus";
 import { localUrl } from "@/utils/methods.js";
 
 const getIpStore = useGetIpStore();
@@ -70,6 +70,8 @@ onMounted(() => {
 	getIpStore.setIp()
 	console.log(`Location: ${getIpStore.getIp()}`)
 	validateUserToken()
+
+
 })
 
 // 监听userInfoStore中loadingSuccess的变化，当它变为false时重新验证

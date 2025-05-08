@@ -13,7 +13,8 @@ export const useUserData = defineStore('userData', () => {
         description: '',
         blog: '',
         isLogin: 0, // 0:未检测 1:已登录 -1:未登录 -2:检测失败
-        loadingSuccess: false
+        loadingSuccess: false,
+        isAdmin: 0,
     })
 
     /**
@@ -40,8 +41,29 @@ export const useUserData = defineStore('userData', () => {
         return userData.value.isLogin === 1
     }
 
+    const isAdmin = () => {
+        return userData.value.isAdmin === 1
+    }
 
+    const clearUserData = () => {
+        userData.value = {
+            id: 0,
+            username: '',
+            avatar: '',
+            description: '',
+            blog: '',
+            isLogin: 0, // 0:未检测 1:已登录 -1:未登录 -2:检测失败
+            loadingSuccess: false,
+            isAdmin: 0,
+        }
+    }
 
-
-    return { userData, getUserData,setUserData,isLogin }
+    return {
+        userData,
+        getUserData,
+        setUserData,
+        isLogin,
+        isAdmin,
+        clearUserData
+    }
 })

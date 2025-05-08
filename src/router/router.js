@@ -2,16 +2,11 @@ import { createRouter, createWebHistory, createWebHashHistory } from 'vue-router
 // import { validateUserToken } from '@/utils/user';
 // ... 其他导入保持不变 ...
 import { ElLoading } from 'element-plus';
-import MercariList from '@/pages/Test/MercariList.vue';
-import AprilFoolActivity from '@/components/aprilfool/AprilFoolActivity.vue';
-import path from 'path';
+// import MercariList from '@/pages/Test/MercariList.vue';
+// import AprilFoolActivity from '@/components/aprilfool/AprilFoolActivity.vue';
+// import path from 'path';
 
 const routes = [
-    {
-        path: '/middle',
-        name: 'middle',
-        component: () => import('@/pages/Test/middletest.vue'),
-    },
     {
         path: '/user/center',
         name: 'userCenter',
@@ -19,45 +14,38 @@ const routes = [
             {
                 path: 'main',
                 name: 'userCenterMain',
-                component: () => import('@/pages/UserCenter/UserCenterContainer.vue'),
+                component: () =>{
+                    const loading = ElLoading.service({
+                        text: '加载用户中心...',
+                        background: 'rgba(255, 255, 255, 0.7)'
+                    });
+                    return import('@/pages/UserCenter/UserCenterContainer.vue').finally(() => {
+                        loading.close();
+                    });
+                }
             },
             {
                 path: 'upload/data',
                 name: 'userCenterUploadData',
-                component: () => import('@/pages/Common/UploadMainData.vue')
+                component: () => {
+                    const loading = ElLoading.service({
+                        text: '加载提交数据...',
+                        background: 'rgba(255, 255, 255, 0.7)'
+                    });
+                    return import('@/pages/Common/UploadMainData.vue').finally(()=>{
+                        loading.close();
+                    })
+                }
+            },
+            {
+                path: 'upload/article',
+                name: 'userCenterUploadArticle',
+                component: () => import('@/pages/Common/UploadMainArticle.vue')
             }
-        ]
-
-    },
-    {
-        path: '/panel/:id',
-        name: 'Panel',
-        component: () => import('@/pages/UserPanel/UserPanelMain.vue'),
-        meta: {
-            title: '用户主页',
-            requiresAuth: false
+        ],
+        beforeEnter: (to, from, next) => {
+            next()
         }
-    },
-    {
-        path: '/goods',
-        component: () => import('@/pages/Goods/index.vue')
-    },
-    {
-        path: '/goods/:id',
-        component: () => import('@/pages/Goods/components/GoodsDetail.vue')
-    },
-    {
-        path: '/april-fool',
-        name: 'AprilFoolActivity',
-        component: AprilFoolActivity,
-        meta: {
-            title: '愚人节快乐'
-        }
-    },
-    {
-        path: '/mercari',
-        name: 'MercariList',
-        component: MercariList
     },
     {
         path: '/pages/:page_id',
@@ -74,9 +62,6 @@ const routes = [
         component: () => import('@/pages/Home.vue'),
         beforeEnter: async (to, from, next) => {
             document.title = 'Wonderlands×Sekai⭐Gallery Wonderhoy——'
-            // if(localStorage.getItem('access_token')){
-            //     await validateUserToken()
-            // }
             next()
         },
     },
@@ -104,10 +89,6 @@ const routes = [
         name: 'details',
         props: true,
         component: () => import('@/pages/Details.vue'),
-        // beforeEnter: (to, from, next) => {
-        //     console.log(from.params)
-        //     next()
-        // },
     },
     {
         path: '/token',
@@ -129,7 +110,6 @@ const routes = [
     {
         path: '/Post',
         name: 'post',
-        // component: () => import('@/pages/Post/PostLayout.vue'),
         beforeEnter: (to, from, next) => {
             if (localStorage.getItem('token') === '9.09') {
                 next()

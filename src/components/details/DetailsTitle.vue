@@ -47,7 +47,7 @@ const props = defineProps({
 	display: flex;
 	flex-direction: column;
 	align-items: flex-start;
-	padding: 8px 20px;
+	padding: 8px 0;
 	.title {
 		font-size: 24px;
 		margin-bottom: 10px;
@@ -70,7 +70,7 @@ const props = defineProps({
 	
 	// 添加移动端适配样式
 	@media screen and (max-width: 768px) {
-		padding: 8px 10px;
+		padding: 8px 0px;
 		
 		.title {
 			font-size: 20px;
